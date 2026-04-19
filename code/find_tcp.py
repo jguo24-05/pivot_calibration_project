@@ -3,19 +3,17 @@ from get_tcp_images import *
 import numpy as np
 import cv2
 
-######################### DETECTION CODE #########################
+######################### DETECTION LOGIC #########################
 # Calculate world coordinates based on projection matrices 
 # points must be formatted as np.array([[center_x], [center_y]], dtype=np.float32)
 def calculateWorldPoint(json_path, projPoints1, projPoints2):
      with open(json_path, 'r') as file:
         json_data = json.load(file)
-        
-        print(type(projPoints1))
-        
         projMatr1 = np.array(json_data["745_projection_mtx"])
         projMatr2 = np.array(json_data["746_projection_mtx"])
         homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
-        return (homogeneous[0], homogeneous[1], homogeneous[2]) / (homogeneous[3])
+        points_3d = homogeneous[:3] / homogeneous[3]
+        return points_3d.flatten()                      ## TODO: is this correct?
 
 
 ################# Attempts to find the TCP in the given image #################
@@ -29,10 +27,11 @@ def detectTCP(color_image, cannyThreshold,
     # 1. Preprocessing (Grayscale + Gaussian Blur)
     gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
     # Blur is crucial to reduce noise/specular highlights on metal surfaces
-    blurred = cv2.GaussianBlur(gray, (9, 9), 5)
+    # blurred = cv2.GaussianBlur(gray, (9, 9), 15)
+    blurred = cv2.medianBlur(gray, 15)
 
     # 2. Detect Drill Tip Handle Edges with Hough Probabilistic Transform 
-    cannyMinThreshold = cannyThreshold/3
+    cannyMinThreshold = cannyThreshold
     edges = cv2.Canny(blurred, cannyMinThreshold, cannyThreshold);
     
     lineTuple = detectLines(edges,
@@ -43,6 +42,9 @@ def detectTCP(color_image, cannyThreshold,
                             minDistBtwnEdges, 
                             maxDistBtwnEdges, 
                             parallelTolerance)   
+    
+    if (lineTuple is None):
+        cv2.putText(color_image, "The tool shaft was not detected this frame", (70, 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
     
     if (lineTuple is not None):
         line1 = lineTuple[0]
@@ -75,6 +77,9 @@ def detectTCP(color_image, cannyThreshold,
                                 dispTolerance)
         
         ## 4. TCP Discovered! ##
+        if (circle is None):
+            cv2.putText(color_image, "The tool shaft was discovered this frame, but not the drill tip", (70, 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+
         if not (circle is None):
             center = circle[0]
             radius = circle[1]
@@ -85,13 +90,12 @@ def detectTCP(color_image, cannyThreshold,
                 
             ## Draw the TCP in the frame ##
             micronsOverPixels = 1000/radius
-            # TODO: figure out how to obtain slope properly ... a first step is flipping the image
             
             cv2.circle(color_image, (center_x, center_y), radius, (0, 255, 0), 2)
             cv2.circle(color_image, (center_x, center_y), 2, (0, 0, 255), 3)
             cv2.putText(color_image, f"Microns per pixel: {micronsOverPixels: .2f}", 
-                        (70, 80), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
+                        (70, 120), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
             
-            return (tcp, color_image)
+            return (tcp, edges)
     
-    return (None, color_image)
+    return (None, edges)

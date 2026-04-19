@@ -7,8 +7,8 @@ def slopeRatio(line1, line2):
     epsilon = 10**-15
     x1, y1, x2, y2 = line1[0]
     u1, v1, u2, v2 = line2[0]
-    if (abs(x2 - x1) < epsilon and abs(u2 - u1) < epsilon): return 1    # both vertical
-    elif (abs(y2 - y1) < epsilon and abs(v2 - v1) < epsilon): return 1  # both horizontal
+    if (abs(x2 - x1) < epsilon and abs(u2 - u1) < epsilon): return 10**9    # both vertical - rule out
+    elif (abs(y2 - y1) < epsilon and abs(v2 - v1) < epsilon): return 10**9  # both horizontal - rule out
     elif (abs(x2 - x1) < epsilon or abs(u2 - u1) < epsilon): return 10**9
     elif (abs(y2 - y1) < epsilon or abs(v2 - v1) < epsilon): return 10**9
     slope1 = (y2 - y1) / (x2 - x1)
@@ -60,23 +60,24 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
             for j in range(i, len(lines)):
                 line1 = lines[i]
                 line2 = lines[j]
+
+                ax1, ay1, ax2, ay2 = line1[0]
+                width = color_image.shape[1]
+                height = color_image.shape[0]
+                if (ax1 < width*0.1 or ax1 > width*0.9 or ay1 > height*0.9):  # TODO: Rule out lines too close to the edge
+                    continue
+
                 rSlope = slopeRatio(line1, line2)
                 distBtwnEdges = distBetweenLines(line1, line2)
-                # print(f"Ratio of Slopes: {rSlope}")
-                # print(f"distBtwnEdges: {distBtwnEdges}")
                 
                 if ((rSlope < 1 + parallelTolerance) and (rSlope > 1 - parallelTolerance)):
                     ax1, ay1, ax2, ay2 = line1[0]
-                    cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 7)    
+                    # cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 7)    
                     bx1, by1, bx2, by2 = line2[0]
-                    cv2.line(edges, (bx1, by1), (bx2, by2), (255, 0, 0), 1) 
+                    # cv2.line(edges, (bx1, by1), (bx2, by2), (255, 0, 0), 1) 
 
                     if (distBtwnEdges > minDistBtwnEdges and distBtwnEdges < maxDistBtwnEdges): 
-                        # Debugging:
-                        # print(f"distBtwnEdges: {distBtwnEdges}")
                         return (line1, line2)
-                    # print(f"Difference in Slopes: {dSlope}")
-                    # print(f"distBtwnEdges: {distBtwnEdges}")
         
         return None     # no parallel lines were found this frame
 
@@ -87,7 +88,7 @@ def detectCircles(grayFrame, accumulatorRes, minDist, cannyThreshold, circAccThr
     circles = cv2.HoughCircles(grayFrame, cv2.HOUGH_GRADIENT, 
                             dp = accumulatorRes, minDist = minDist, param1 = cannyThreshold,   # for hough_gradient_alt 
                             param2 = circAccThreshold, minRadius = minRadius, 
-                            maxRadius = maxRadius);
+                            maxRadius = maxRadius)
 
     if not (circles is None):
         circles = np.round(circles).astype("uint16")

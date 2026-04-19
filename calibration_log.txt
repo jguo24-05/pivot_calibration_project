@@ -1,0 +1,164 @@
+[  25.965103  -10.061042 -102.96484 ]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------
+[  25.746706   -9.842278 -102.10373 ]
+Calibration Attempts: 12
+Successful Detections: 1
+--------------------
+[  25.964867   -9.925674 -102.968895]
+Calibration Attempts: 7
+Successful Detections: 1
+--------------------
+[  25.964867   -9.925674 -102.968895]
+Calibration Attempts: 23
+Successful Detections: 1
+--------------------
+[  26.015951   -9.841944 -102.09502 ]
+Calibration Attempts: 2
+Successful Detections: 1
+--------------------
+[  25.807838  -10.184612 -105.65508 ]
+Calibration Attempts: 2
+Successful Detections: 1
+--------------------
+[  26.016575  -10.110287 -102.0843  ]
+Calibration Attempts: 4
+Successful Detections: 1
+--------------------
+[  25.965103  -10.061042 -102.96484 ]
+Calibration Attempts: 4
+Successful Detections: 1
+--------------------
+[  25.96567   -10.060676 -102.95511 ]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------
+[  25.746706   -9.842278 -102.10373 ]
+Calibration Attempts: 9
+Successful Detections: 1
+--------------------
+[  26.18725   -10.010168 -103.840065]
+Calibration Attempts: 5
+Successful Detections: 1
+--------------------
+[  25.96567   -10.060676 -102.95511 ]
+Calibration Attempts: 14
+Successful Detections: 1
+--------------------
+[  25.747223   -9.841965 -102.095215]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------
+[  25.913658   -9.873684 -103.844894]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------
+[  26.015688   -9.976494 -102.09959 ]
+Calibration Attempts: 8
+Successful Detections: 1
+--------------------
+[  26.016933  -10.244418 -102.07813 ]
+Calibration Attempts: 3
+Successful Detections: 1
+--------------------
+[  26.015688   -9.976494 -102.09959 ]
+Calibration Attempts: 3
+Successful Detections: 1
+--------------------
+[  25.861324   -9.958804 -104.74013 ]
+Calibration Attempts: 9
+Successful Detections: 1
+--------------------
+[  25.747221  -10.11072  -102.09522 ]
+Calibration Attempts: 10
+Successful Detections: 1
+--------------------
+[  26.016249   -9.976129 -102.08993 ]
+Calibration Attempts: 7
+Successful Detections: 1
+--------------------
+[  25.965372   -9.925353 -102.960236]
+Calibration Attempts: 7
+Successful Detections: 1
+--------------------
+[  25.965103  -10.061042 -102.96484 ]
+Calibration Attempts: 5
+Successful Detections: 1
+--------------------
+[  26.016575  -10.110287 -102.0843  ]
+Calibration Attempts: 2
+Successful Detections: 1
+--------------------
+[  26.016933  -10.244418 -102.07813 ]
+Calibration Attempts: 5
+Successful Detections: 1
+--------------------
+[  26.016575  -10.110287 -102.0843  ]
+Calibration Attempts: 5
+Successful Detections: 1
+--------------------
+[  25.965372   -9.925353 -102.960236]
+Calibration Attempts: 7
+Successful Detections: 1
+--------------------
+[  25.807838  -10.184612 -105.65508 ]
+Calibration Attempts: 14
+Successful Detections: 1
+--------------------
+[  25.964867   -9.925674 -102.968895]
+Calibration Attempts: 2
+Successful Detections: 1
+--------------------
+[  25.798925   -9.893369 -101.24889 ]
+Calibration Attempts: 6
+Successful Detections: 1
+--------------------
+[  25.965105   -9.790007 -102.96484 ]
+Calibration Attempts: 4
+Successful Detections: 1
+--------------------
+[  25.746948   -9.97651  -102.09974 ]
+Calibration Attempts: 7
+Successful Detections: 1
+--------------------
+[  25.861324   -9.958804 -104.74013 ]
+Calibration Attempts: 10
+Successful Detections: 1
+--------------------
+[  25.747528  -10.244904 -102.09019 ]
+Calibration Attempts: 3
+Successful Detections: 1
+--------------------
+[  25.861324   -9.958804 -104.74013 ]
+Calibration Attempts: 5
+Successful Detections: 1
+--------------------
+[  26.015951  -10.110698 -102.09503 ]
+Calibration Attempts: 3
+Successful Detections: 1
+--------------------
+[  25.965105   -9.790007 -102.96484 ]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------
+[  25.861324   -9.958804 -104.74013 ]
+Calibration Attempts: 3
+Successful Detections: 1
+--------------------
+[  26.015951  -10.110698 -102.09503 ]
+Calibration Attempts: 11
+Successful Detections: 1
+--------------------
+[  25.746948   -9.97651  -102.09974 ]
+Calibration Attempts: 19
+Successful Detections: 1
+--------------------
+[  25.965105   -9.790007 -102.96484 ]
+Calibration Attempts: 18
+Successful Detections: 1
+--------------------
+[  25.746706   -9.842278 -102.10373 ]
+Calibration Attempts: 1
+Successful Detections: 1
+--------------------

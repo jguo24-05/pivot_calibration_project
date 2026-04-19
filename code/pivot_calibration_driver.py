@@ -1,28 +1,16 @@
-import pypylon.pylon as py
 from geometric_helpers import *
-from charuco_calibration import *
 from find_tcp import *
-import numpy as np
 import cv2
-import math
-import json
 
-
-# TODO: refine hough circles to be more accomodating (currently trying hough_circles_alt)
-# Note: top-down lighting from a little far away worked (on 3/29)
-# TODO: try Cutie for spatial and temporal stability
-
-######################### DETECTION LOOP #########################
-
-
+######################### CALIBRATION LOOP #########################
 def pivotCalibration():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
-     cameraMatrix745, distCoeffs745, F) = openCamerasAndCalibrationFiles()
+     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
     
     ### Detection Parameters ###
     # Canny Threshold
-    cannyThreshMin = 30
+    cannyThreshMin = 20
     cannyThreshMax = 100
     # Line Accumulator Matrix
     lineAccMin = 100
@@ -43,11 +31,11 @@ def pivotCalibration():
     maxLineMin = 50
     maxLineMax = 250
     # Minimum distance between edges
-    minDistMin = 200
+    minDistMin = 250
     minDistMax = 400
     # Maximum distance between edges      
-    maxDistMin = 800
-    maxDistMax = 3000
+    maxDistMin = 400
+    maxDistMax = 800
     # Error for tip and axis alignment
     errorMin = 10
     errorMax = 50
@@ -102,17 +90,14 @@ def pivotCalibration():
     # Tolerance for how far the radius can be from the detected central axis
     cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win_name, errorMin, errorMax, lambda a: None)
 
+    # Counter for profiling instability
+    calibration_attempts = 0
+    successful_detections = 0
+
     # Detect the tool center point
     poses = []
+    cam_array.StartGrabbing()
     while (len(poses) < 20):
-        # 1. Move robot
-            # TODO: fill this out
-
-        # 2. Snap Images
-        (image_left, image_right) = snap_tcp_images(cam_array, frame_counts, converter, 
-                                                    cameraMatrix746, distCoeffs746, 
-                                                    cameraMatrix745, distCoeffs745)
-        
         # Get left camera trackbar positions
         cannyThresholdL = cv2.getTrackbarPos('Canny Threshold', "Window 1")    
         line_threshL = cv2.getTrackbarPos('Line Accumulator Threshold', "Window 1")
@@ -137,40 +122,70 @@ def pivotCalibration():
         maxRadiusR = cv2.getTrackbarPos('Maximum Radius', "Window 2")
         dispToleranceR = cv2.getTrackbarPos('Maximum Error for Tip and Axis Alignment', "Window 2")
 
-    
-    # # Calculate its 3D position relative to the camera
-    # worldCoordinates = []
-    # if (points745 is not None):
-    #     worldPoint = grab3DPoints("./calibration_data/external_parameters.json", points746, points745)
-    #     print(f"World Point: {worldPoint}")
-    #     # worldCoordinates.append(worldPoint)
-
-    # return worldCoordinates
-
-
-# Runs the main loop until the TCP is detected by both cameras (loop broken with 'q' key)
-def runDetection(win_name, cam_array, frame_counts, converter, cameraMatrix745, distCoeffs745, cameraMatrix746, distCoeffs746, F):
-               
-    
-
-    (image_left, image_right) = snap_tcp_images(cam_array, frame_counts, converter, 
-                                                cameraMatrix746, distCoeffs746, 
-                                                cameraMatrix745, distCoeffs745)
-                
-
-    # if (cam_id == 0):
-    #     cv2.imshow('Window 1', color_image)
+        # 1. Move robot
+        # TODO: integrate this with robot code, just a key press for now            
+            
+        # 2. Snap Images
+        (image_left, image_right) = snap_tcp_images(cam_array, frame_counts, converter, 
+                                                    cameraMatrix746, distCoeffs746, 
+                                                    cameraMatrix745, distCoeffs745)
+        # 3. Detect TCP
+        (tcp_left, _) = detectTCP(image_left, cannyThresholdL, 
+                            line_threshL, circ_threshL, 
+                            minLineLengthL, maxLineGapL, 
+                            minDistBtwnEdgesL, maxDistBtwnEdgesL, 
+                            minRadiusL, maxRadiusL, 
+                            dispToleranceL, 0.3)
         
-    # elif (cam_id == 1):
-    #     cv2.imshow('Window 2', color_image)
+        (tcp_right, _) = detectTCP(image_right, cannyThresholdR,
+                            line_threshR, circ_threshR,
+                            minLineLengthR, maxLineGapR,
+                            minDistBtwnEdgesR, maxDistBtwnEdgesR,
+                            minRadiusR, maxRadiusR,
+                            dispToleranceR, 0.3)
+
+        # 3. Triangulate the point to find the 3D coordinate relative to the camera center
+        if (tcp_left is not None and tcp_right is not None):
+            successful_detections += 1
+            worldCoordinate = calculateWorldPoint("./calibration_data/external_parameters.json", tcp_left, tcp_right)
+            x = worldCoordinate[0]
+            y = worldCoordinate[1]
+            z = worldCoordinate[2]
+            cv2.putText(image_left, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+            cv2.putText(image_right, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+            poses.append(worldCoordinate)
+            # Write to a log
+            with open("./calibration_log.txt", "a") as f:
+                f.write(f"{worldCoordinate}\n")
+                f.write(f"Calibration Attempts: {calibration_attempts}\n")
+                f.write(f"Successful Detections: {successful_detections}\n")
+                f.write("-" * 20 + "\n") # Optional separator line
+            calibration_attempts = 0
+            successful_detections = 0
+
+        # 4. If a tcp was not detected, write a message to the frame
+        if (tcp_left is None):
+            cv2.putText(image_left, "TCP not found in this frame", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+        if (tcp_right is None):
+            cv2.putText(image_right, "TCP not found in this frame", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+
+        # 5. Display images
+        cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('Window 1', 700, 700)
+        cv2.imshow('Window 1', image_left)
+        cv2.namedWindow("Window 2", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('Window 2', 700, 700)
+        cv2.imshow('Window 2', image_right)
+       # q escape
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
     
-    # # check if q button has been pressed
-    # if cv2.waitKey(1) & 0xFF == ord('q'):
-    #     break
-                    
-    # cam_array.StopGrabbing()
-    # cam_array.Close()
-    # return (points745, points746)
+        calibration_attempts += 1
+
+    cam_array.StopGrabbing()
+    cam_array.Close()
+
 
 
 ######################### Driver #########################
+pivotCalibration()
