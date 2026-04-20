@@ -154,14 +154,8 @@ def pivotCalibration():
             cv2.putText(image_left, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
             cv2.putText(image_right, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
             poses.append(worldCoordinate)
-            # Write to a log
             with open("./calibration_log.txt", "a") as f:
                 f.write(f"{worldCoordinate}\n")
-                f.write(f"Calibration Attempts: {calibration_attempts}\n")
-                f.write(f"Successful Detections: {successful_detections}\n")
-                f.write("-" * 20 + "\n") # Optional separator line
-            calibration_attempts = 0
-            successful_detections = 0
 
         # 4. If a tcp was not detected, write a message to the frame
         if (tcp_left is None):
@@ -182,6 +176,11 @@ def pivotCalibration():
     
         calibration_attempts += 1
 
+    # Write to a log
+    with open("./calibration_log.txt", "a") as f:
+        f.write(f"Calibration Attempts: {calibration_attempts}\n")
+        f.write(f"Successful Detections: {successful_detections}\n")
+        f.write("-" * 20 + "\n") # Optional separator line
     cam_array.StopGrabbing()
     cam_array.Close()
 
