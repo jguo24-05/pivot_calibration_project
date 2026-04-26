@@ -61,10 +61,10 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
                 line1 = lines[i]
                 line2 = lines[j]
 
-                ax1, ay1, ax2, ay2 = line1[0]
+                ax1, ay1, _, _ = line1[0]
                 width = color_image.shape[1]
                 height = color_image.shape[0]
-                if (ax1 < width*0.1 or ax1 > width*0.9 or ay1 > height*0.9):  # TODO: Rule out lines too close to the edge
+                if (ax1 < width*0.25 or ax1 > width*0.75 or ay1 < height * 0.3):  # TODO: Rule out lines too close to the edge
                     continue
 
                 rSlope = slopeRatio(line1, line2)
@@ -80,6 +80,45 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
                         return (line1, line2)
         
         return None     # no parallel lines were found this frame
+
+
+# Detect lines using Probabilistic Hough Transform
+def detectLinesAlt(edges, color_image, line_thresh, minLineLength, maxLineGap, minDistBtwnEdges, maxDistBtwnEdges, parallelTolerance):
+    result = []
+    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=line_thresh, minLineLength=minLineLength, maxLineGap=maxLineGap) 
+
+    if lines is not None:
+        if (len(lines) < 2):
+            return result    # skip this frame if fewer than two lines were found 
+    
+        for i in range(len(lines)-1):  
+            # Debugging 
+            # ax1, ay1, ax2, ay2 = lines[i][0]
+            # cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
+                
+            for j in range(i, len(lines)):
+                line1 = lines[i]
+                line2 = lines[j]
+
+                ax1, ay1, _, _ = line1[0]
+                width = color_image.shape[1]
+                height = color_image.shape[0]
+                if (ax1 < width*0.25 or ax1 > width*0.75 or ay1 < height * 0.3):  # TODO: Rule out lines too close to the edge
+                    continue
+
+                rSlope = slopeRatio(line1, line2)
+                distBtwnEdges = distBetweenLines(line1, line2)
+                
+                if ((rSlope < 1 + parallelTolerance) and (rSlope > 1 - parallelTolerance)):
+                    ax1, ay1, ax2, ay2 = line1[0]
+                    # cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 7)    
+                    bx1, by1, bx2, by2 = line2[0]
+                    # cv2.line(edges, (bx1, by1), (bx2, by2), (255, 0, 0), 1) 
+
+                    if (distBtwnEdges > minDistBtwnEdges and distBtwnEdges < maxDistBtwnEdges): 
+                        result.append((line1, line2))
+        
+    return result     # no parallel lines were found this frame
 
 
 # Detect circles that lie on the given centralAxis

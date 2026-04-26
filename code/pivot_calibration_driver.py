@@ -6,7 +6,7 @@ import cv2
 def pivotCalibration():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
-     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
+     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(100000, 100000)
     
     ### Detection Parameters ###
     # Canny Threshold
@@ -37,58 +37,58 @@ def pivotCalibration():
     maxDistMin = 400
     maxDistMax = 800
     # Error for tip and axis alignment
-    errorMin = 10
-    errorMax = 50
+    errorMin = 20
+    errorMax = 100
 
     ## Window 1 - Left Camera Feed ##
     cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Window 1", 800, 650)
-    win_name = "Window 1"
+    cv2.resizeWindow("Window 1", 700, 700)
+    win1_name = "Window 1"
 
-    cv2.createTrackbar('Canny Threshold', win_name, cannyThreshMin, cannyThreshMax, lambda a: None);
+    cv2.createTrackbar('Canny Threshold', win1_name, cannyThreshMin, cannyThreshMax, lambda a: None);
     # Accumulator Threshold for Lines
-    cv2.createTrackbar('Line Accumulator Threshold', win_name, lineAccMin, lineAccMax, lambda a: None);
+    cv2.createTrackbar('Line Accumulator Threshold', win1_name, lineAccMin, lineAccMax, lambda a: None);
     # Circle Radius Accumulator Threshold
-    cv2.createTrackbar('Circle Accumulator Threshold', win_name, circleAccMin, circleAccMax, lambda a: None)
+    cv2.createTrackbar('Circle Accumulator Threshold', win1_name, circleAccMin, circleAccMax, lambda a: None)
     # Min Radius: Minimum circle radius to detect
-    cv2.createTrackbar('Minimum Radius', win_name, minRadiusMin, minRadiusMax, lambda a: None)
+    cv2.createTrackbar('Minimum Radius', win1_name, minRadiusMin, minRadiusMax, lambda a: None)
     # Max Radius: Maximum circle radius to detect
-    cv2.createTrackbar('Maximum Radius', win_name, maxRadiusMin, maxRadiusMax, lambda a: None)
+    cv2.createTrackbar('Maximum Radius', win1_name, maxRadiusMin, maxRadiusMax, lambda a: None)
     # Minimum Line Length: Minimum line length to detect
-    cv2.createTrackbar('Minimum Line Length', win_name, minLineMin, minLineMax, lambda a: None)
+    cv2.createTrackbar('Minimum Line Length', win1_name, minLineMin, minLineMax, lambda a: None)
     # Maximum Line Gap: Maximum allowed gap in a line
-    cv2.createTrackbar('Maximum Line Gap', win_name, maxLineMin, maxLineMax, lambda a: None)
+    cv2.createTrackbar('Maximum Line Gap', win1_name, maxLineMin, maxLineMax, lambda a: None)
     # Minimum Distance Between Edge Lines
-    cv2.createTrackbar('Minimum Distance Between Edges', win_name, minDistMin, minDistMax, lambda a: None)
+    cv2.createTrackbar('Minimum Distance Between Edges', win1_name, minDistMin, minDistMax, lambda a: None)
     # # Minimum Distance Between Edge Lines
-    cv2.createTrackbar('Maximum Distance Between Edges', win_name, maxDistMin, maxDistMax, lambda a: None)
+    cv2.createTrackbar('Maximum Distance Between Edges', win1_name, maxDistMin, maxDistMax, lambda a: None)
     # Tolerance for how far the radius can be from the detected central axis
-    cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win_name, errorMin, errorMax, lambda a: None)
+    cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win1_name, errorMin, errorMax, lambda a: None)
 
     ## Window 2  - Right Camera Feed ##
     cv2.namedWindow("Window 2", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Window 2", 800, 650)
-    win_name = "Window 2"
+    cv2.resizeWindow("Window 2", 700, 700)
+    win2_name = "Window 2"
 
-    cv2.createTrackbar('Canny Threshold', win_name, cannyThreshMin, cannyThreshMax, lambda a: None);
+    cv2.createTrackbar('Canny Threshold', win2_name, cannyThreshMin, cannyThreshMax, lambda a: None);
     # Accumulator Threshold for Lines
-    cv2.createTrackbar('Line Accumulator Threshold', win_name, lineAccMin, lineAccMax, lambda a: None);
+    cv2.createTrackbar('Line Accumulator Threshold', win2_name, lineAccMin, lineAccMax, lambda a: None);
     # Circle Radius Accumulator Threshold
-    cv2.createTrackbar('Circle Accumulator Threshold', win_name, circleAccMin, circleAccMax, lambda a: None)
+    cv2.createTrackbar('Circle Accumulator Threshold', win2_name, circleAccMin, circleAccMax, lambda a: None)
     # Min Radius: Minimum circle radius to detect
-    cv2.createTrackbar('Minimum Radius', win_name, minRadiusMin, minRadiusMax, lambda a: None)
+    cv2.createTrackbar('Minimum Radius', win2_name, minRadiusMin, minRadiusMax, lambda a: None)
     # Max Radius: Maximum circle radius to detect
-    cv2.createTrackbar('Maximum Radius', win_name, maxRadiusMin, maxRadiusMax, lambda a: None)
+    cv2.createTrackbar('Maximum Radius', win2_name, maxRadiusMin, maxRadiusMax, lambda a: None)
     # Minimum Line Length: Minimum line length to detect
-    cv2.createTrackbar('Minimum Line Length', win_name, minLineMin, minLineMax, lambda a: None)
+    cv2.createTrackbar('Minimum Line Length', win2_name, minLineMin, minLineMax, lambda a: None)
     # Maximum Line Gap: Maximum allowed gap in a line
-    cv2.createTrackbar('Maximum Line Gap', win_name, maxLineMin, maxLineMax, lambda a: None)
+    cv2.createTrackbar('Maximum Line Gap', win2_name, maxLineMin, maxLineMax, lambda a: None)
     # Minimum Distance Between Edge Lines
-    cv2.createTrackbar('Minimum Distance Between Edges', win_name, minDistMin, minDistMax, lambda a: None)
+    cv2.createTrackbar('Minimum Distance Between Edges', win2_name, minDistMin, minDistMax, lambda a: None)
     # Minimum Distance Between Edge Lines
-    cv2.createTrackbar('Maximum Distance Between Edges', win_name, maxDistMin, maxDistMax, lambda a: None)
+    cv2.createTrackbar('Maximum Distance Between Edges', win2_name, maxDistMin, maxDistMax, lambda a: None)
     # Tolerance for how far the radius can be from the detected central axis
-    cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win_name, errorMin, errorMax, lambda a: None)
+    cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win2_name, errorMin, errorMax, lambda a: None)
 
     # Counter for profiling instability
     calibration_attempts = 0
@@ -130,14 +130,14 @@ def pivotCalibration():
                                                     cameraMatrix746, distCoeffs746, 
                                                     cameraMatrix745, distCoeffs745)
         # 3. Detect TCP
-        (tcp_left, _) = detectTCP(image_left, cannyThresholdL, 
+        (tcp_left, central_axis_pointl, color_imageL, left_edges) = detectTCP(image_left, cannyThresholdL, 
                             line_threshL, circ_threshL, 
                             minLineLengthL, maxLineGapL, 
                             minDistBtwnEdgesL, maxDistBtwnEdgesL, 
                             minRadiusL, maxRadiusL, 
                             dispToleranceL, 0.3)
         
-        (tcp_right, _) = detectTCP(image_right, cannyThresholdR,
+        (tcp_right, central_axis_pointr, color_imageR, right_edges) = detectTCP(image_right, cannyThresholdR,
                             line_threshR, circ_threshR,
                             minLineLengthR, maxLineGapR,
                             minDistBtwnEdgesR, maxDistBtwnEdgesR,
@@ -153,9 +153,9 @@ def pivotCalibration():
             z = worldCoordinate[2]
             cv2.putText(image_left, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
             cv2.putText(image_right, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
-            poses.append(worldCoordinate)
-            with open("./calibration_log.txt", "a") as f:
-                f.write(f"{worldCoordinate}\n")
+            # poses.append(worldCoordinate)
+            # with open("./calibration_log.txt", "a") as f:
+            #     f.write(f"{worldCoordinate}\n")
 
         # 4. If a tcp was not detected, write a message to the frame
         if (tcp_left is None):
@@ -164,23 +164,21 @@ def pivotCalibration():
             cv2.putText(image_right, "TCP not found in this frame", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
 
         # 5. Display images
-        cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('Window 1', 700, 700)
-        cv2.imshow('Window 1', image_left)
-        cv2.namedWindow("Window 2", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('Window 2', 700, 700)
-        cv2.imshow('Window 2', image_right)
+        cv2.imshow(win1_name, color_imageL)
+        cv2.imshow(win2_name, color_imageR)
        # q escape
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
+            cv2.waitKey(1)
             break
     
         calibration_attempts += 1
 
     # Write to a log
-    with open("./calibration_log.txt", "a") as f:
-        f.write(f"Calibration Attempts: {calibration_attempts}\n")
-        f.write(f"Successful Detections: {successful_detections}\n")
-        f.write("-" * 20 + "\n") # Optional separator line
+    # with open("./calibration_log.txt", "a") as f:
+    #     f.write(f"Calibration Attempts: {calibration_attempts}\n")
+    #     f.write(f"Successful Detections: {successful_detections}\n")
+    #     f.write("-" * 20 + "\n") # Optional separator line
     cam_array.StopGrabbing()
     cam_array.Close()
 

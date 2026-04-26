@@ -23,6 +23,8 @@ def detectTCP(color_image, cannyThreshold,
                 minDistBtwnEdges, maxDistBtwnEdges, 
                 minRadius, maxRadius, 
                 dispTolerance, parallelTolerance):
+    
+    color_image = color_image.copy()
 
     # 1. Preprocessing (Grayscale + Gaussian Blur)
     gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
@@ -57,6 +59,7 @@ def detectTCP(color_image, cannyThreshold,
         bx2 = int((ax2+cx2)/2.0)
         by2 = int((ay2+cy2)/2.0)
         centralAxis = ((bx1, by1), (bx2, by2))
+        centralAxisMidpoint = ((bx1+bx2)/2, (by1+by2)/2)
 
         cv2.line(color_image, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
         cv2.line(color_image, (cx1, cy1), (cx2, cy2), (255, 0, 0), 5)
@@ -89,13 +92,87 @@ def detectTCP(color_image, cannyThreshold,
             tcp = np.array([[center_x], [center_y]], dtype=np.float32)
                 
             ## Draw the TCP in the frame ##
-            micronsOverPixels = 1000/radius
+            # micronsOverPixels = 1000/radius
             
             cv2.circle(color_image, (center_x, center_y), radius, (0, 255, 0), 2)
             cv2.circle(color_image, (center_x, center_y), 2, (0, 0, 255), 3)
-            cv2.putText(color_image, f"Microns per pixel: {micronsOverPixels: .2f}", 
-                        (70, 120), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
+            # cv2.putText(color_image, f"Microns per pixel: {micronsOverPixels: .2f}", 
+            #             (70, 120), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
+            
+            return (tcp, centralAxisMidpoint, color_image, edges)
+    
+    return (None, None, color_image, edges)
+
+
+################# Attempts to find the TCP in the given image #################
+def detectTCPAlt(color_image, cannyThreshold, 
+                line_thresh, circ_thresh, 
+                minLineLength, maxLineGap, 
+                minDistBtwnEdges, maxDistBtwnEdges, 
+                minRadius, maxRadius, 
+                dispTolerance, parallelTolerance):
+    
+    color_image = color_image.copy()
+
+    # 1. Preprocessing (Grayscale + Gaussian Blur)
+    gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
+    # Blur is crucial to reduce noise/specular highlights on metal surfaces
+    # blurred = cv2.GaussianBlur(gray, (9, 9), 15)
+    blurred = cv2.medianBlur(gray, 15)
+    cannyMinThreshold = cannyThreshold
+    edges = cv2.Canny(blurred, cannyMinThreshold, cannyThreshold)
+
+    # 2. Detect Circles
+    accumulatorRes = 1     
+    minDist = 2000;  
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 
+                                dp = accumulatorRes, minDist = minDist, param1 = cannyThreshold,   # for hough_gradient_alt 
+                                param2 = circ_thresh, minRadius = minRadius, 
+                                maxRadius = maxRadius)
+    
+    linePair = detectLines(edges,
+                            color_image, 
+                            line_thresh, 
+                            minLineLength, 
+                            maxLineGap, 
+                            minDistBtwnEdges, 
+                            maxDistBtwnEdges, 
+                            parallelTolerance)   
+    
+    if (circles is None or linePair is None):
+        return (None, edges)
+    
+    circles = np.round(circles).astype("uint16")
+    for i in circles[0,:]:
+        center = (i[0], i[1])
+        radius = i[2]
+        center_x = center[0]
+        center_y = center[1]
+
+        cv2.circle(color_image, (center_x, center_y), radius, (0, 255, 0), 2)
+        cv2.circle(color_image, (center_x, center_y), 2, (0, 0, 255), 3)
+
+        line1 = linePair[0]
+        line2 = linePair[1]
+
+        ax1, ay1, ax2, ay2 = line1[0]
+        cx1, cy1, cx2, cy2 = line2[0]
+        
+        bx1 = int((ax1+cx1)/2.0)
+        by1 = int((ay1+cy1)/2.0)
+        bx2 = int((ax2+cx2)/2.0)
+        by2 = int((ay2+cy2)/2.0)
+        centralAxis = ((bx1, by1), (bx2, by2))
+
+        if (pointOnLine(center, centralAxis[0], centralAxis[1], dispTolerance)):
+            cv2.line(color_image, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
+            cv2.line(color_image, (cx1, cy1), (cx2, cy2), (255, 0, 0), 5)
+            cv2.line(color_image, centralAxis[0], centralAxis[1], (125, 125, 0), 5)
+            tcp = np.array([[center_x], [center_y]], dtype=np.float32)
+                
+            # cv2.putText(color_image, f"Microns per pixel: {micronsOverPixels: .2f}", 
+            #             (70, 120), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
             
             return (tcp, edges)
-    
+
     return (None, edges)
