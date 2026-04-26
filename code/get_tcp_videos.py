@@ -6,7 +6,7 @@ import cv2
 def getTCPVideos():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
-     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(100000, 100000)
+     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
     
     ### Detection Parameters ###
     # Canny Threshold
@@ -91,12 +91,12 @@ def getTCPVideos():
     cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win2_name, errorMin, errorMax, lambda a: None)
 
 
-    ##### Initialize video streams #####
-    writers = dict()
-    lvid_initialized = False
-    rvid_initialized = False
+    ##### Initialize variables for saving jpgs #####
     frames = 0
     targetFrames = 300
+    leftDirectory = "./code/left_example_1"
+    rightDirectory = "./code/right_example_1"
+    jsonDirectory = "./detected_points_example1.json"
 
     #### Store the initial points in which the TCP was detected ####
     lcam_points = []
@@ -136,23 +136,12 @@ def getTCPVideos():
                                                     cameraMatrix746, distCoeffs746, 
                                                     cameraMatrix745, distCoeffs745)
         
-        #### Initialize the video writers based on the data of the first frames ####
-        if not lvid_initialized:    # left = cam1 = cam746
-            h, w = image_left.shape[:2]
-            fps = cam_array[1].ResultingFrameRate.Value if hasattr(cam_array[0], 'ResultingFrameRate') else 30.0
-            writers[0] = cv2.VideoWriter("left_camera_output.mp4", cv2.VideoWriter.fourcc(*'mp4v'), fps, (w, h))
-            lvid_initialized = True
-        
-        if not rvid_initialized:    # right = cam0 = cam745
-            h, w = image_right.shape[:2]
-            fps = cam_array[0].ResultingFrameRate.Value if hasattr(cam_array[1], 'ResultingFrameRate') else 30.0
-            writers[1] = cv2.VideoWriter("right_camera_output.mp4", cv2.VideoWriter.fourcc(*'mp4v'), fps, (w, h))
-            rvid_initialized = True
-
         ### Write the image to the corresponding video feed ###
         if (initial_points_found):
-            writers[0].write(image_left)
-            writers[1].write(image_right)
+            success = cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
+            cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
+            if not success:
+                print(f"❌ Failed to write frame {frames}. Does the directory exist?")
             frames += 1
 
             # Motivation..
@@ -184,8 +173,11 @@ def getTCPVideos():
             and tcp_left is not None and tcp_right is not None
             and central_axis_pointl is not None
             and central_axis_pointr is not None):
-            writers[0].write(image_left)
-            writers[1].write(image_right)
+
+            cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
+            cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
+            frames += 1
+
             lcam_points.append([0, tcp_left[0][0], tcp_left[1][0]])
             lcam_points.append([0, central_axis_pointl[0], central_axis_pointl[1]])
             rcam_points.append([0, tcp_right[0][0], tcp_right[1][0]])
@@ -231,7 +223,7 @@ def getTCPVideos():
     # Convert everything to lists in one go
     clean_data = {k: v for k, v in points_dict.items()}
 
-    with open("detected_points.json", 'w') as f:
+    with open(jsonDirectory, 'w') as f:
         json.dump(clean_data, f, indent=4)
 
 
