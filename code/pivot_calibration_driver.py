@@ -31,11 +31,11 @@ def pivotCalibration():
     maxLineMin = 50
     maxLineMax = 250
     # Minimum distance between edges
-    minDistMin = 250
+    minDistMin = 100
     minDistMax = 400
     # Maximum distance between edges      
-    maxDistMin = 400
-    maxDistMax = 800
+    maxDistMin = 10000
+    maxDistMax = 20000
     # Error for tip and axis alignment
     errorMin = 20
     errorMax = 100

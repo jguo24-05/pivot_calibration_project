@@ -33,8 +33,8 @@ def detectTCP(color_image, cannyThreshold,
     blurred = cv2.medianBlur(gray, 15)
 
     # 2. Detect Drill Tip Handle Edges with Hough Probabilistic Transform 
-    cannyMinThreshold = cannyThreshold
-    edges = cv2.Canny(blurred, cannyMinThreshold, cannyThreshold);
+    cannyMinThreshold = cannyThreshold / 3
+    edges = cv2.Canny(blurred, cannyMinThreshold, cannyThreshold)
     
     lineTuple = detectLines(edges,
                             color_image, 
@@ -124,7 +124,7 @@ def detectTCPAlt(color_image, cannyThreshold,
 
     # 2. Detect Circles
     accumulatorRes = 1     
-    minDist = 2000;  
+    minDist = 2000
     circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 
                                 dp = accumulatorRes, minDist = minDist, param1 = cannyThreshold,   # for hough_gradient_alt 
                                 param2 = circ_thresh, minRadius = minRadius, 
@@ -140,7 +140,7 @@ def detectTCPAlt(color_image, cannyThreshold,
                             parallelTolerance)   
     
     if (circles is None or linePair is None):
-        return (None, edges)
+        return (None, None, color_image, edges)
     
     circles = np.round(circles).astype("uint16")
     for i in circles[0,:]:
@@ -163,6 +163,7 @@ def detectTCPAlt(color_image, cannyThreshold,
         bx2 = int((ax2+cx2)/2.0)
         by2 = int((ay2+cy2)/2.0)
         centralAxis = ((bx1, by1), (bx2, by2))
+        centralAxisMidpoint = ((bx1+bx2)/2, (by1+by2)/2)
 
         if (pointOnLine(center, centralAxis[0], centralAxis[1], dispTolerance)):
             cv2.line(color_image, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
@@ -173,6 +174,6 @@ def detectTCPAlt(color_image, cannyThreshold,
             # cv2.putText(color_image, f"Microns per pixel: {micronsOverPixels: .2f}", 
             #             (70, 120), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 0), 3)
             
-            return (tcp, edges)
+            return (tcp, centralAxisMidpoint, color_image, edges)
 
-    return (None, edges)
+    return (None, None, color_image, edges)

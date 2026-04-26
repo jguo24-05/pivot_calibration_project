@@ -29,19 +29,54 @@ def pointOnLine(point, endpoint1, endpoint2, tolerance):
 
 # Returns the euclidean distance between <m1, c1> and <m2, c2>
 def distBetweenLines(line1, line2): 
-    epsilon = 10**-6
-    ax1, ax2, ay1, ay2 = line1[0]
-    bx1, bx2, by1, by2 = line2[0]
-    if (abs(ax2-ax1) < epsilon and abs(bx2-bx1) < epsilon):    # vertical lines
-        return abs(bx1-ax1)
-    elif (abs(ax2-ax1) < epsilon or abs(bx2-bx1) < epsilon):   # only one vertical line
-        return 10**9    # just a huge number so tests fail
+    if (are_lines_collinear(line1[0], line2[0], 15)):
+        return 0
     else:
-        m1 = (ay2-ay1) / float((ax2-ax1))
-        m2 = (by2-by1) / float((bx2-bx1))
-        c1 = ay1 - m1*ax1
-        c2 = by1 - m2*bx1
-        return pow(pow((m1-m2), 2) + pow(c1-c2, 2), 0.5)
+        epsilon = 10^-9
+        ax1, ay1, ax2, ay2 = line1[0]
+        bx1, by1, bx2, by2 = line2[0]
+
+        if (ax2-ax1 < epsilon and bx2-bx1 < epsilon):
+            return abs(ay2-by2)
+        elif (ay2-ay1 < epsilon and by2-by1 < epsilon):
+            return abs(ax2-bx2)
+        else:
+            m1 = (ay2-ay1) / float((ax2-ax1))
+            m2 = (by2-by1) / float((bx2-bx1))
+            c1 = ay1 - m1*ax1
+            c2 = by1 - m2*bx1
+            return pow(pow((m1-m2), 2) + pow(c1-c2, 2), 0.5)
+    
+
+def point_to_line_dist(point, line_start, line_end):
+    p = np.array(point)
+    s = np.array(line_start)
+    e = np.array(line_end)
+    
+    # Vector of the line segment
+    line_vec = e - s
+    # Vector from start to point
+    point_vec = p - s
+    
+    line_len_sq = np.sum(line_vec**2)
+    
+    if line_len_sq == 0:
+        return np.linalg.norm(point_vec)
+    
+    # Projection factor (clamped between 0 and 1)
+    t = np.dot(point_vec, line_vec) / line_len_sq
+    t = max(0, min(1, t))
+    
+    # Find the closest point on the segment
+    projection = s + t * line_vec
+    
+    return np.linalg.norm(p - projection)
+
+
+def are_lines_collinear(line1, line2, dist_threshold):
+    ax1, ay1, ax2, ay2 = line1
+    bx1, by1, _, _ = line2
+    return point_to_line_dist((bx1,by1), (ax1, ay1), (ax2, ay2)) < dist_threshold
 
 
 # Detect lines using Probabilistic Hough Transform
@@ -55,29 +90,26 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
         for i in range(len(lines)-1):  
             # Debugging 
             # ax1, ay1, ax2, ay2 = lines[i][0]
-            # cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
+            # cv2.line(color_image, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
                 
             for j in range(i, len(lines)):
+                # Debugging
+                # bx1, by1, bx2, by2 = lines[j][0]
+                # cv2.line(color_image, (bx1, by1), (bx2, by2), (255, 0, 0), 5)   
+
                 line1 = lines[i]
                 line2 = lines[j]
-
-                ax1, ay1, _, _ = line1[0]
-                width = color_image.shape[1]
-                height = color_image.shape[0]
-                if (ax1 < width*0.25 or ax1 > width*0.75 or ay1 < height * 0.3):  # TODO: Rule out lines too close to the edge
-                    continue
-
+                
                 rSlope = slopeRatio(line1, line2)
                 distBtwnEdges = distBetweenLines(line1, line2)
                 
                 if ((rSlope < 1 + parallelTolerance) and (rSlope > 1 - parallelTolerance)):
-                    ax1, ay1, ax2, ay2 = line1[0]
-                    # cv2.line(edges, (ax1, ay1), (ax2, ay2), (255, 0, 0), 7)    
-                    bx1, by1, bx2, by2 = line2[0]
-                    # cv2.line(edges, (bx1, by1), (bx2, by2), (255, 0, 0), 1) 
-
                     if (distBtwnEdges > minDistBtwnEdges and distBtwnEdges < maxDistBtwnEdges): 
                         return (line1, line2)
+                    else:
+                        print(f"Distance issue: {distBtwnEdges}")
+                else:
+                    print("Slope issue")
         
         return None     # no parallel lines were found this frame
 
