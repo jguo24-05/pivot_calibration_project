@@ -94,9 +94,9 @@ def getTCPVideos():
     ##### Initialize variables for saving jpgs #####
     frames = 0
     targetFrames = 300
-    leftDirectory = "./code/left_example_1"
-    rightDirectory = "./code/right_example_1"
-    jsonDirectory = "./detected_points_example1.json"
+    leftDirectory = "./code/left_example_2"
+    rightDirectory = "./code/right_example_2"
+    jsonDirectory = "./detected_points_example2.json"
 
     #### Store the initial points in which the TCP was detected ####
     lcam_points = []
