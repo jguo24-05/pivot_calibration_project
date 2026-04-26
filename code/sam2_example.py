@@ -1,4 +1,8 @@
 import os
+import cv2
+from sam2.build_sam import build_sam2_video_predictor
+
+
 # if using Apple MPS, fall back to CPU for unsupported ops
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import numpy as np
@@ -28,9 +32,6 @@ elif device.type == "mps":
         "give numerically different outputs and sometimes degraded performance on MPS. "
         "See e.g. https://github.com/pytorch/pytorch/issues/84936 for a discussion."
     )
-
-from sam2.build_sam import build_sam2_video_predictor
-import cv2
 
 sam2_checkpoint = "./sam2/checkpoints/sam2.1_hiera_large.pt"
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
@@ -62,7 +63,7 @@ def show_box(box, ax):
     ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0, 0, 0, 0), lw=2))
 
 # `video_dir` a directory of JPEG frames with filenames like `<frame_index>.jpg`
-video_dir = "./code/left_example_1"
+video_dir = "./code/right_example_2"
 
 # scan all the JPEG frame names in this directory
 frame_names = [
@@ -78,7 +79,7 @@ ann_obj_id = 1  # give a unique id to each object we interact with (it can be an
 
 # Let's add a 2nd positive click at (x, y) = (250, 220) to refine the mask
 # sending all clicks (and their labels) to `add_new_points_or_box`
-points = np.array([[824,468], [653,662]], dtype=np.float32)
+points = np.array([[962,504], [1049,575]], dtype=np.float32)
 # for labels, `1` means positive click and `0` means negative click
 labels = np.array([1, 1], np.int32)
 _, out_obj_ids, out_mask_logits = predictor.add_new_points_or_box(
@@ -137,5 +138,5 @@ for out_frame_idx in range(0, len(frame_names)):
         mask = next(iter(frame_dict.values()))
         mask = (mask.squeeze() > 0).astype(np.uint8) * 255
         res = cv2.bitwise_and(image, image, mask=mask)
-        cv2.imwrite(f'./sam2_images/left_example_1/{out_frame_idx:05d}.png', res)
+        cv2.imwrite(f'./sam2_images/right_example_2/{out_frame_idx:05d}.png', res)
 
