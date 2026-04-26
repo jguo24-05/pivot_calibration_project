@@ -8,5 +8,4 @@ Important Note:
 Make sure the 745 camera is plugged into the first USB slot, and 746 the second. The 746 camera is calibrated as the left camera, and the 745 camera the right.
 
 TODO:
-Figure out slope calculations
-Profile instabilities, then maybe incorporate Cotracker/Cutie/SAM2 on the camera streams
+Obtain the TCP from the mask returned by SAM2.
