@@ -3,7 +3,7 @@ from find_tcp import *
 import cv2
 
 ######################### CALIBRATION LOOP #########################
-def pivotCalibration():
+def pivotCalibrationTester():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
      cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(100000, 100000)
@@ -185,4 +185,4 @@ def pivotCalibration():
 
 
 ######################### Driver #########################
-pivotCalibration()
+pivotCalibrationTester()

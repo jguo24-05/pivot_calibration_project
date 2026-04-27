@@ -3,8 +3,8 @@ from geometric_helpers import *
 import glob
 
 ## Process SAM2 Masks to find the TCP ##
-leftPath = "./sam2_images/left_example_2"
-rightPath = "./sam2_images/right_example_2"
+leftPath = "./sam2_images/left_example_1"
+rightPath = "./sam2_images/right_example_1"
 
 ### Detection Parameters ###
 # Canny Threshold
@@ -14,7 +14,7 @@ cannyThreshMax = 100
 circleAccMin = 15 
 circleAccMax = 300
 # Minimum circle radius
-minRadiusMin = 30   # Note: should be 30 for example2, 50 for example1
+minRadiusMin = 50   # Note: should be 30 for example2, 50 for example1
 minRadiusMax = 50
 # Maximum circle radius
 maxRadiusMin = 100
@@ -106,7 +106,8 @@ def findTCPFromMask(filename):
     return (None, color_image, color_image)
 
 
-### Testing ###
+######################### DRIVER #########################
+### Test on single image ###
 # filename = f'{leftPath}/00003.png'
 # (center, drawing, img) = findTCPFromMask(filename)
 # if (drawing is not None):
@@ -117,9 +118,14 @@ def findTCPFromMask(filename):
 #             cv2.destroyAllWindows()
 
 detectedFrames = 0
-for filename in glob.glob(f'{rightPath}/*.png'):
+points_dict = {}
+imgDirectory = f'{rightPath}/*.png'
+jsonPath = "./tcp_right_example1"
+
+for filename in glob.glob(imgDirectory):
     (center, drawing, img) = findTCPFromMask(filename)
     if (center is not None):
+        points_dict[detectedFrames] = [int(center[0]), int(center[1])]
         detectedFrames += 1
     if (img is not None and drawing is not None):
         cv2.imshow(win1_name, img)
@@ -131,12 +137,15 @@ for filename in glob.glob(f'{rightPath}/*.png'):
         #     cv2.destroyAllWindows()
         #     break
 
-# Write to a log
-with open("./calibration_log.txt", "a") as f:
-    f.write("-" * 20 + "\n") 
-    f.write(f"{detectedFrames} frames detected out of 300\n")
-    f.write("-" * 20 + "\n") 
+# Calibration Log
+# with open("./calibration_log.txt", "a") as f:
+#     f.write(imgDirectory + "\n")
+#     f.write("-" * 20 + "\n") 
+#     f.write(f"{detectedFrames} frames detected out of 300\n")
+#     f.write("-" * 20 + "\n") 
+
+# Write the detected points to a json file
+with open(jsonPath, 'w') as f:
+    json.dump(points_dict, f, indent=4)
 
 cv2.destroyAllWindows()
-
-            

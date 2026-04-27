@@ -138,10 +138,7 @@ def getTCPVideos():
         
         ### Write the image to the corresponding video feed ###
         if (initial_points_found):
-            success = cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
             cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
-            if not success:
-                print(f"❌ Failed to write frame {frames}. Does the directory exist?")
             frames += 1
 
             # Motivation..
