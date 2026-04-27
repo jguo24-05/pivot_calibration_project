@@ -3,8 +3,8 @@ from geometric_helpers import *
 import glob
 
 ## Process SAM2 Masks to find the TCP ##
-leftPath = "./sam2_images/left_example_2"
-rightPath = "./sam2_images/right_example_2"
+leftPath = "./sam2_images/left_example_1"
+rightPath = "./sam2_images/right_example_1"
 
 ### Detection Parameters ###
 # Canny Threshold
@@ -14,7 +14,7 @@ cannyThreshMax = 100
 circleAccMin = 15 
 circleAccMax = 300
 # Minimum circle radius
-minRadiusMin = 30   # Note: should be 30 for example2, 50 for example1
+minRadiusMin = 50   # Note: should be 30 for example2, 50 for example1
 minRadiusMax = 50
 # Maximum circle radius
 maxRadiusMin = 100
@@ -43,7 +43,7 @@ def findTCPFromMask(filename):
         drawing = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
         cv2.drawContours(drawing, [smooth_edges], -1, (0, 0, 255), 2)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
-        drawing = cv2.morphologyEx(drawing, cv2.MORPH_CLOSE, kernel)
+        drawing = cv2.morphologyEx(drawing, cv2.MORPH_CLOSE, kernel)    # for smoothing the ridges of the larger drill
         grayContours = cv2.cvtColor(drawing, cv2.COLOR_BGR2GRAY)
         
         # 4. Finding the edges of the tool
@@ -98,7 +98,7 @@ def findTCPFromMask(filename):
                         cv2.circle(img, (center_x, center_y), 2, (0, 0, 255), 3)
                         cv2.circle(drawing, (center_x, center_y), radius, (0, 255, 0), 2)
                         cv2.circle(drawing, (center_x, center_y), 2, (255, 255, 0), 3)
-                        print(f"Radius: {radius}")
+                        # print(f"Radius: {radius}")
                         return (center, drawing, img)
             else:
                 print("No circles :(")
@@ -116,17 +116,26 @@ def findTCPFromMask(filename):
 #         if key == ord('q') or key == 27:
 #             cv2.destroyAllWindows()
 
-
-for filename in glob.glob(f'{leftPath}/*.png'):
+detectedFrames = 0
+for filename in glob.glob(f'{rightPath}/*.png'):
     (center, drawing, img) = findTCPFromMask(filename)
+    if (center is not None):
+        detectedFrames += 1
     if (img is not None and drawing is not None):
         cv2.imshow(win1_name, img)
         cv2.waitKey(1)
-        # key = cv2.waitKey(0)
 
+        # For clicking through the images one by one
+        # key = cv2.waitKey(0)
         # if key == ord('q') or key == 27:
         #     cv2.destroyAllWindows()
         #     break
+
+# Write to a log
+with open("./calibration_log.txt", "a") as f:
+    f.write("-" * 20 + "\n") 
+    f.write(f"{detectedFrames} frames detected out of 300\n")
+    f.write("-" * 20 + "\n") 
 
 cv2.destroyAllWindows()
 

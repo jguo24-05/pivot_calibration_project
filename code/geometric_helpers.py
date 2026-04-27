@@ -106,10 +106,10 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
                 if ((rSlope < 1 + parallelTolerance) and (rSlope > 1 - parallelTolerance)):
                     if (distBtwnEdges > minDistBtwnEdges and distBtwnEdges < maxDistBtwnEdges): 
                         return (line1, line2)
-                    else:
-                        print(f"Distance issue: {distBtwnEdges}")
-                else:
-                    print("Slope issue")
+                #     else:
+                #         print(f"Distance issue: {distBtwnEdges}")
+                # else:
+                #     print("Slope issue")
         
         return None     # no parallel lines were found this frame
 
