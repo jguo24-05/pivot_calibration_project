@@ -1,19 +1,24 @@
-Left Camera 2mm Tip
+Right Camera 4mm Tip
 --------------------
-256 frames detected out of 300
---------------------
-
-Right Camera 2mm Tip
---------------------
-289 frames detected out of 300
+275 frames detected out of 300
 --------------------
 
 Left Camera 4mm Tip
 --------------------
-230 frames detected out of 300
+289 frames detected out of 300
 --------------------
 
 Right Camera 4mm Tip
 --------------------
-275 frames detected out of 300
+298 frames detected out of 300
+--------------------
+
+Left Camera 2mm Tip
+--------------------
+280 frames detected out of 300
+--------------------
+
+RIght Camera 2mm Tip
+--------------------
+294 frames detected out of 300
 --------------------

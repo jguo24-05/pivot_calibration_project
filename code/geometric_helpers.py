@@ -65,12 +65,8 @@ def point_to_line_dist(point, line_start, line_end):
     
     # Projection factor (clamped between 0 and 1)
     t = np.dot(point_vec, line_vec) / line_len_sq
-    t = max(0, min(1, t))
     
-    # Find the closest point on the segment
-    projection = s + t * line_vec
-    
-    return np.linalg.norm(p - projection)
+    return np.linalg.norm(point_vec - t * line_vec)
 
 
 def are_lines_collinear(line1, line2, dist_threshold):

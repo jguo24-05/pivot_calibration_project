@@ -3,8 +3,8 @@ from geometric_helpers import *
 import glob
 
 ## Process SAM2 Masks to find the TCP ##
-leftPath = "./sam2_images/left_example_1"
-rightPath = "./sam2_images/right_example_1"
+leftPath = "./sam2_images/left_example_2"
+rightPath = "./sam2_images/right_example_2"
 
 ### Detection Parameters ###
 # Canny Threshold
@@ -14,7 +14,7 @@ cannyThreshMax = 100
 circleAccMin = 15 
 circleAccMax = 300
 # Minimum circle radius
-minRadiusMin = 50   # Note: should be 30 for example2, 50 for example1
+minRadiusMin = 30   # Note: should be 30 for example2, 50 for example1
 minRadiusMax = 50
 # Maximum circle radius
 maxRadiusMin = 100
