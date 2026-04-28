@@ -6,7 +6,7 @@ import cv2
 def pivotCalibrationTester():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
-     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(100000, 100000)
+     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
     
     ### Detection Parameters ###
     # Canny Threshold
@@ -31,7 +31,7 @@ def pivotCalibrationTester():
     maxLineMin = 50
     maxLineMax = 250
     # Minimum distance between edges
-    minDistMin = 100
+    minDistMin = 20
     minDistMax = 400
     # Maximum distance between edges      
     maxDistMin = 10000
