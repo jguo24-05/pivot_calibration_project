@@ -2,30 +2,21 @@ from find_tcp import *
 from geometric_helpers import *
 import glob
 
-## Process SAM2 Masks to find the TCP ##
-leftPath = "./sam2_images/left_example_1"
-rightPath = "./sam2_images/right_example_1"
-
-### Detection Parameters ###
-# Canny Threshold
-cannyThreshMin = 30
-cannyThreshMax = 100
-# Circle Accumulator Matrix
-circleAccMin = 15 
-circleAccMax = 300
-# Minimum circle radius
-minRadiusMin = 50   # Note: should be 30 for example2, 50 for example1
-minRadiusMax = 50
-# Maximum circle radius
-maxRadiusMin = 100
-maxRadiusMax = 200
-
-cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("Window 1", 700, 700)
-win1_name = "Window 1"
 
 ### Detect TCP Using Bounding Boxes ###
-def findTCPFromMask(filename):
+def findTCPFromMask(filename, isTwoMMTip):
+    ### Detection Parameters ###
+    # Canny Threshold
+    cannyThresh = 30
+    # Circle Accumulator Matrix
+    circleAcc = 15 
+    # Minimum circle radius
+    minRadius = 50   # Note: should be 30 for 2mm tip, 50 for 4mm tip
+    if (isTwoMMTip):
+        minRadius = 30
+    # Maximum circle radius
+    maxRadius = 100
+
     color_image = cv2.imread(filename)
     if color_image is not None:
         img = color_image.copy()
@@ -79,9 +70,9 @@ def findTCPFromMask(filename):
             accumulatorRes = 1     
             minDist = 2000
             circles = cv2.HoughCircles(grayContours, cv2.HOUGH_GRADIENT, 
-                                        dp = accumulatorRes, minDist = minDist, param1 = cannyThreshMin, 
-                                        param2 = circleAccMin, minRadius = minRadiusMin, 
-                                        maxRadius = maxRadiusMin)
+                                        dp = accumulatorRes, minDist = minDist, param1 = cannyThresh, 
+                                        param2 = circleAcc, minRadius = minRadius, 
+                                        maxRadius = maxRadius)
             
             if not (circles is None):
                 circles = np.round(circles).astype("uint16")
@@ -106,46 +97,55 @@ def findTCPFromMask(filename):
     return (None, color_image, color_image)
 
 
-######################### DRIVER #########################
 ### Test on single image ###
-# filename = f'{leftPath}/00003.png'
-# (center, drawing, img) = findTCPFromMask(filename)
-# if (drawing is not None):
-#         cv2.imshow(win1_name, drawing)
+def testSingleImage(filename, isTwoMMTip):
+    cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Window 1", 700, 700)
+    win1_name = "Window 1"
 
-#         key = cv2.waitKey(0)
-#         if key == ord('q') or key == 27:
-#             cv2.destroyAllWindows()
+    (center, drawing, img) = findTCPFromMask(filename, isTwoMMTip)
+    if (drawing is not None):
+            cv2.imshow(win1_name, drawing)
+            key = cv2.waitKey(0)
+            if key == ord('q') or key == 27:
+                cv2.destroyAllWindows()
 
-detectedFrames = 0
-points_dict = {}
-imgDirectory = f'{rightPath}/*.png'
-jsonPath = "./tcp_right_example1"
 
-for filename in glob.glob(imgDirectory):
-    (center, drawing, img) = findTCPFromMask(filename)
-    if (center is not None):
-        points_dict[detectedFrames] = [int(center[0]), int(center[1])]
-        detectedFrames += 1
-    if (img is not None and drawing is not None):
-        cv2.imshow(win1_name, img)
-        cv2.waitKey(1)
+### Finds TCPs in all images of the given directory and writes to the jsonPath ###
+def findAndWriteTCPS(directory, jsonPath, showTCPs, isTwoMMTip):
+    ## Process SAM2 Masks to find the TCP ##
+    cv2.namedWindow("Window 1", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Window 1", 700, 700)
+    win1_name = "Window 1"
 
-        # For clicking through the images one by one
-        # key = cv2.waitKey(0)
-        # if key == ord('q') or key == 27:
-        #     cv2.destroyAllWindows()
-        #     break
+    detectedFrames = 0
+    points_dict = {}
+    imgDirectory = f'{directory}/*.png'
 
-# Calibration Log
-# with open("./calibration_log.txt", "a") as f:
-#     f.write(imgDirectory + "\n")
-#     f.write("-" * 20 + "\n") 
-#     f.write(f"{detectedFrames} frames detected out of 300\n")
-#     f.write("-" * 20 + "\n") 
+    for filename in glob.glob(imgDirectory):
+        (center, drawing, img) = findTCPFromMask(filename, isTwoMMTip)
+        if (center is not None):
+            points_dict[detectedFrames] = [int(center[0]), int(center[1])]
+            detectedFrames += 1
+        if (showTCPs and img is not None and drawing is not None):
+            cv2.imshow(win1_name, img)
+            cv2.waitKey(1)
 
-# Write the detected points to a json file
-with open(jsonPath, 'w') as f:
-    json.dump(points_dict, f, indent=4)
+            # For clicking through the images one by one
+            # key = cv2.waitKey(0)
+            # if key == ord('q') or key == 27:
+            #     cv2.destroyAllWindows()
+            #     break
 
-cv2.destroyAllWindows()
+    # Calibration Log
+    # with open("./calibration_log.txt", "a") as f:
+    #     f.write(imgDirectory + "\n")
+    #     f.write("-" * 20 + "\n") 
+    #     f.write(f"{detectedFrames} frames detected out of 300\n")
+    #     f.write("-" * 20 + "\n") 
+
+    # Write the detected points to a json file
+    with open(jsonPath, 'w') as f:
+        json.dump(points_dict, f, indent=4)
+
+    cv2.destroyAllWindows()

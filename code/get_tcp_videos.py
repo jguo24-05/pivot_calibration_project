@@ -3,14 +3,17 @@ from find_tcp import *
 import cv2
 
 ######################### CALIBRATION LOOP #########################
-def getTCPVideos():
-    (cam_array, frame_counts, converter,
-     cameraMatrix746, distCoeffs746, 
-     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
-    
-    ### Detection Parameters ###
+def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, exposureLeft, exposureRight, is2MMTip):
+
+    #### Store the initial points in which the TCP was detected ####
+    frames = 0
+    lcam_points = []
+    rcam_points = []
+    initial_points_found = False
+
+    ### Set detection parameters ###
     # Canny Threshold
-    cannyThreshMin = 20
+    cannyThreshMin = 30
     cannyThreshMax = 100
     # Line Accumulator Matrix
     lineAccMin = 100
@@ -19,8 +22,10 @@ def getTCPVideos():
     circleAccMin = 25
     circleAccMax = 300
     # Minimum circle radius
-    minRadiusMin = 30
-    minRadiusMax = 50
+    minRadiusMin = 50
+    if (is2MMTip):
+        minRadiusMin = 30
+    minRadiusMax = 80
     # Maximum circle radius
     maxRadiusMin = 100
     maxRadiusMax = 200
@@ -31,11 +36,11 @@ def getTCPVideos():
     maxLineMin = 50
     maxLineMax = 250
     # Minimum distance between edges
-    minDistMin = 250
-    minDistMax = 400
+    minDistMin = 2
+    minDistMax = 100
     # Maximum distance between edges      
-    maxDistMin = 400
-    maxDistMax = 800
+    maxDistMin = 2000
+    maxDistMax = 2500
     # Error for tip and axis alignment
     errorMin = 20
     errorMax = 100
@@ -90,18 +95,10 @@ def getTCPVideos():
     # Tolerance for how far the radius can be from the detected central axis
     cv2.createTrackbar('Maximum Error for Tip and Axis Alignment', win2_name, errorMin, errorMax, lambda a: None)
 
-
-    ##### Initialize variables for saving jpgs #####
-    frames = 0
-    targetFrames = 300
-    leftDirectory = "./code/left_example_2"
-    rightDirectory = "./code/right_example_2"
-    jsonDirectory = "./detected_points_example2.json"
-
-    #### Store the initial points in which the TCP was detected ####
-    lcam_points = []
-    rcam_points = []
-    initial_points_found = False
+    # Open cameras
+    (cam_array, frame_counts, converter,
+     cameraMatrix746, distCoeffs746, 
+     cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(exposureLeft, exposureRight)
 
     # Detect the tool center point
     cam_array.StartGrabbing()
@@ -130,14 +127,14 @@ def getTCPVideos():
         maxRadiusR = cv2.getTrackbarPos('Maximum Radius', "Window 2")
         dispToleranceR = cv2.getTrackbarPos('Maximum Error for Tip and Axis Alignment', "Window 2")
 
-       
-        # 2. Snap Images
+        # Snap Images
         (image_left, image_right) = snap_tcp_images(cam_array, frame_counts, converter, 
                                                     cameraMatrix746, distCoeffs746, 
                                                     cameraMatrix745, distCoeffs745)
         
-        ### Write the image to the corresponding video feed ###
+        ### Write the image to the corresponding directory if TCP found ###
         if (initial_points_found):
+            cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
             cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
             frames += 1
 
@@ -149,61 +146,60 @@ def getTCPVideos():
             elif (frames == 2 * targetFrames / 3):
                 print("Two thirds of the way there!")
 
-        # 3. Detect TCP
-        (tcp_left, central_axis_pointl, color_image_left, left_edges) = detectTCP(image_left, cannyThresholdL, 
-                            line_threshL, circ_threshL, 
-                            minLineLengthL, maxLineGapL, 
-                            minDistBtwnEdgesL, maxDistBtwnEdgesL, 
-                            minRadiusL, maxRadiusL, 
-                            dispToleranceL, 0.3)
-        
-        (tcp_right, central_axis_pointr, color_image_right, right_edges) = detectTCP(image_right, cannyThresholdR,
-                            line_threshR, circ_threshR,
-                            minLineLengthR, maxLineGapR,
-                            minDistBtwnEdgesR, maxDistBtwnEdgesR,
-                            minRadiusR, maxRadiusR,
-                            dispToleranceR, 0.3)
-        
-
-        ### Save the detected point for SAM2 ###
-        if (not initial_points_found 
-            and tcp_left is not None and tcp_right is not None
-            and central_axis_pointl is not None
-            and central_axis_pointr is not None):
-
-            cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
-            cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
-            frames += 1
-
-            lcam_points.append([0, tcp_left[0][0], tcp_left[1][0]])
-            lcam_points.append([0, central_axis_pointl[0], central_axis_pointl[1]])
-            rcam_points.append([0, tcp_right[0][0], tcp_right[1][0]])
-            rcam_points.append([0, central_axis_pointr[0], central_axis_pointr[1]])
-
-            cv2.circle(color_image_left, (int(tcp_left[0][0]), int(tcp_left[1][0])), 5, (0, 255, 0), 4)   # center
-            cv2.circle(color_image_left, (int(central_axis_pointl[0]), int(central_axis_pointl[1])),    # shaft
-                        5, (255, 255, 0), 4)
-            cv2.circle(color_image_right, (int(tcp_right[0][0]), int(tcp_right[1][0])), 5, (0, 255, 0), 4) # center
-            cv2.circle(color_image_right, (int(central_axis_pointr[0]), int(central_axis_pointr[1])),    # shaft
-                        5, (255, 255, 0), 4)
+        # Otherwise, detect TCP 
+        if (not initial_points_found):
+            (tcp_left, central_axis_pointl, color_image_left, left_edges) = detectTCP(image_left, cannyThresholdL, 
+                                line_threshL, circ_threshL, 
+                                minLineLengthL, maxLineGapL, 
+                                minDistBtwnEdgesL, maxDistBtwnEdgesL, 
+                                minRadiusL, maxRadiusL, 
+                                dispToleranceL, 0.3)
             
-            cv2.imshow(win1_name, color_image_left)
-            cv2.imshow(win2_name, color_image_right)
-            cv2.waitKey(2)  # visually verify that the points reside within the shaft
-
-            print("Initial point found for SAM2!")
-            initial_points_found = True
+            (tcp_right, central_axis_pointr, color_image_right, right_edges) = detectTCP(image_right, cannyThresholdR,
+                                line_threshR, circ_threshR,
+                                minLineLengthR, maxLineGapR,
+                                minDistBtwnEdgesR, maxDistBtwnEdgesR,
+                                minRadiusR, maxRadiusR,
+                                dispToleranceR, 0.3)
             
-        # 5. Display images
-        cv2.imshow(win1_name, color_image_left)
-        cv2.imshow(win2_name, color_image_right)
+            if (tcp_left is not None and tcp_right is not None and
+                central_axis_pointl is not None and central_axis_pointr is not None):
+
+                ### Save the detected point for SAM2 ###
+                cv2.imwrite(f"{leftDirectory}/{frames:05d}.jpg", image_left)
+                cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
+                frames += 1
+
+                lcam_points.append([0, tcp_left[0][0], tcp_left[1][0]])
+                lcam_points.append([0, central_axis_pointl[0], central_axis_pointl[1]])
+                rcam_points.append([0, tcp_right[0][0], tcp_right[1][0]])
+                rcam_points.append([0, central_axis_pointr[0], central_axis_pointr[1]])
+
+                cv2.circle(color_image_left, (int(tcp_left[0][0]), int(tcp_left[1][0])), 5, (0, 255, 0), 4)   # center
+                cv2.circle(color_image_left, (int(central_axis_pointl[0]), int(central_axis_pointl[1])),    # shaft
+                            5, (255, 255, 0), 4)
+                cv2.circle(color_image_right, (int(tcp_right[0][0]), int(tcp_right[1][0])), 5, (0, 255, 0), 4) # center
+                cv2.circle(color_image_right, (int(central_axis_pointr[0]), int(central_axis_pointr[1])),    # shaft
+                            5, (255, 255, 0), 4)
+                
+                cv2.imshow(win1_name, color_image_left)
+                cv2.imshow(win2_name, color_image_right)
+                cv2.waitKey(2)  # visually verify that the points reside within the shaft - o/w, start over
+
+                print("Initial point found for SAM2!")
+                initial_points_found = True
+            
+        # Display images
+        cv2.imshow(win1_name, image_left)
+        cv2.imshow(win2_name, image_right)
 
        # q escape
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             cv2.waitKey(1)
             break
-
+    
+    ### Write initial points to json file ###
     cv2.destroyAllWindows()
     cv2.waitKey(1)
     cam_array.StopGrabbing()
@@ -222,7 +218,3 @@ def getTCPVideos():
 
     with open(jsonDirectory, 'w') as f:
         json.dump(clean_data, f, indent=4)
-
-
-######################### Driver #########################
-getTCPVideos()
