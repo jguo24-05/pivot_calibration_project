@@ -26,6 +26,9 @@ def findTCPFromMask(filename, isTwoMMTip):
 
         # 2. Finding contours of tool
         contours, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return (None, color_image, color_image)
+        
         tool_contour = max(contours, key=cv2.contourArea)
         epsilon = 0.001 * cv2.arcLength(tool_contour, True)
         smooth_edges = cv2.approxPolyDP(tool_contour, epsilon, True)

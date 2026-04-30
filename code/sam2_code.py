@@ -88,23 +88,23 @@ def segment_images(video_dir, output_dir, firstPoints):
         labels=labels,
     )
 
-    # # show the results on the current (interacted) frame
-    # plt.figure(figsize=(9, 6))
-    # plt.title(f"frame {ann_frame_idx}")
-    # imagePath = os.path.join(video_dir, frame_names[ann_frame_idx])
-    # image = Image.open(imagePath)
-    # plt.imshow(image)
-    # show_points(points, labels, plt.gca())
-    # show_mask((out_mask_logits[0] > 0.0).cpu().numpy(), plt.gca(), obj_id=out_obj_ids[0])
+    # show the results on the current (interacted) frame
+    plt.figure(figsize=(9, 6))
+    plt.title(f"frame {ann_frame_idx}")
+    imagePath = os.path.join(video_dir, frame_names[ann_frame_idx])
+    image = Image.open(imagePath)
+    plt.imshow(image)
+    show_points(points, labels, plt.gca())
+    show_mask((out_mask_logits[0] > 0.0).cpu().numpy(), plt.gca(), obj_id=out_obj_ids[0])
 
-    # mask = (out_mask_logits[0].squeeze() > 0.0).cpu().numpy().astype(np.uint8) * 255
-    # image = np.array(image)
-    # res = cv2.bitwise_and(image, image, mask=mask)
-    # cv2.imwrite('./test.png', res)
+    mask = (out_mask_logits[0].squeeze() > 0.0).cpu().numpy().astype(np.uint8) * 255
+    image = np.array(image)
+    res = cv2.bitwise_and(image, image, mask=mask)
+    cv2.imwrite('./test.png', res)
 
-    # plt.figure(figsize=(10,10))
-    # plt.imshow(res)
-    # plt.show()
+    plt.figure(figsize=(10,10))
+    plt.imshow(res)
+    plt.show()
 
     # run propagation throughout the video and collect the results in a dict
     video_segments = {}  # video_segments contains the per-frame segmentation results
