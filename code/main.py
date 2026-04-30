@@ -3,15 +3,15 @@ from get_tcp_videos import *
 from triangulation import *
 # from sam2_code import *
 
-leftRawDirectory = "./code/left_test_1"
-rightRawDirectory = "./code/right_test_1"
-pointsDirectory = "./detected_points_test1.json"
+leftRawDirectory = "./code/left_test_3"
+rightRawDirectory = "./code/right_test_3"
+pointsDirectory = "./detected_points_test2.json"
 
-leftMaskedDirectory = "./sam2_images/left_test_1"
-rightMaskedDirectory = "./sam2_images/right_test_1"
+leftMaskedDirectory = "./sam2_images/left_test_3"
+rightMaskedDirectory = "./sam2_images/right_test_3"
 
-leftTCPJSONPath = "./tcp_left_test1.json"
-rightTCPJSONPath = "./tcp_right_test1.json"
+leftTCPJSONPath = "./tcp_left_test3.json"
+rightTCPJSONPath = "./tcp_right_test3.json"
 
 isTwoMMTip = True
 showDetectedTCPs = True

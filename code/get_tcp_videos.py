@@ -153,14 +153,16 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
                                 minLineLengthL, maxLineGapL, 
                                 minDistBtwnEdgesL, maxDistBtwnEdgesL, 
                                 minRadiusL, maxRadiusL, 
-                                dispToleranceL, 0.3)
+                                dispToleranceL, 0.5)
             
             (tcp_right, central_axis_pointr, color_image_right, right_edges) = detectTCP(image_right, cannyThresholdR,
                                 line_threshR, circ_threshR,
                                 minLineLengthR, maxLineGapR,
                                 minDistBtwnEdgesR, maxDistBtwnEdgesR,
                                 minRadiusR, maxRadiusR,
-                                dispToleranceR, 0.3)
+                                dispToleranceR, 0.5)
+            image_left = color_image_left
+            image_right = color_image_right
             
             if (tcp_left is not None and tcp_right is not None and
                 central_axis_pointl is not None and central_axis_pointr is not None):
@@ -188,6 +190,8 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
 
                 print("Initial point found for SAM2!")
                 initial_points_found = True
+
+                
             
         # Display images
         cv2.imshow(win1_name, image_left)
