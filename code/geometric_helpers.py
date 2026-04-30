@@ -40,6 +40,10 @@ def distBetweenLines(line1, line2):
             return abs(ay2-by2)
         elif (ay2-ay1 < epsilon and by2-by1 < epsilon):
             return abs(ax2-bx2)
+        elif (ax2-ax1 < epsilon):
+            return 0
+        elif (bx2-bx1 < epsilon):
+            return 0
         else:
             m1 = (ay2-ay1) / float((ax2-ax1))
             m2 = (by2-by1) / float((bx2-bx1))
