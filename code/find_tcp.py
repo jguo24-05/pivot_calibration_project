@@ -6,14 +6,46 @@ import cv2
 ######################### DETECTION LOGIC #########################
 # Calculate world coordinates based on projection matrices 
 # points must be formatted as np.array([[center_x], [center_y]], dtype=np.float32)
+# def calculateWorldPoint(json_path, projPoints1, projPoints2):
+#      with open(json_path, 'r') as file:
+#         json_data = json.load(file)
+#         projMatr1 = np.array(json_data["745_projection_mtx"])
+#         projMatr2 = np.array(json_data["746_projection_mtx"])
+#         homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
+
+#         print(homogeneous[3])
+
+#         points_3d = homogeneous[:3] / homogeneous[3]
+#         return points_3d.flatten()                      ## TODO: is this correct?
+     
 def calculateWorldPoint(json_path, projPoints1, projPoints2):
-     with open(json_path, 'r') as file:
-        json_data = json.load(file)
-        projMatr1 = np.array(json_data["745_projection_mtx"])
-        projMatr2 = np.array(json_data["746_projection_mtx"])
-        homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
-        points_3d = homogeneous[:3] / homogeneous[3]
-        return points_3d.flatten()                      ## TODO: is this correct?
+    with open(json_path, 'r') as file:
+        data = json.load(file)
+        
+        # Load Rectified Projection Matrices (from your JSON)
+        P1 = np.array(data["745_projection_mtx"])
+        P2 = np.array(data["746_projection_mtx"])
+        
+        # You need these from your calibration to "clean" the points
+        K1 = np.array(data["745_intrinsic_mtx"]) # Ensure these exist in JSON
+        D1 = np.array(data["745_dist_coeffs"])
+        R1 = np.array(data["745_rect_transform"]) # From stereoRectify
+        
+        K2 = np.array(data["746_intrinsic_mtx"])
+        D2 = np.array(data["746_dist_coeffs"])
+        R2 = np.array(data["746_rect_transform"])
+
+        # Step 1: Map raw pixels to Rectified Plane
+        # Use P1 and P2 here so the points end up in the coordinate system the P matrices expect
+        points1_rect = cv2.undistortPoints(projPoints1, K1, D1, R=R1, P=P1)
+        points2_rect = cv2.undistortPoints(projPoints2, K2, D2, R=R2, P=P2)
+
+        # Step 2: Triangulate the "clean" points
+        homogeneous = cv2.triangulatePoints(P1, P2, points1_rect, points2_rect)
+        
+        # Step 3: Normalize
+        world_coords = homogeneous[:3] / homogeneous[3]
+        return world_coords.flatten()
 
 
 ################# Attempts to find the TCP in the given image #################
@@ -54,10 +86,30 @@ def detectTCP(color_image, cannyThreshold,
         ax1, ay1, ax2, ay2 = line1[0]
         cx1, cy1, cx2, cy2 = line2[0]
         
-        bx1 = int((ax1+cx1)/2.0)
-        by1 = int((ay1+cy1)/2.0)
-        bx2 = int((ax2+cx2)/2.0)
-        by2 = int((ay2+cy2)/2.0)
+        topx1 = ax1
+        topy1 = ay1
+        botx1 = ax2
+        boty1 = ay2
+        if (ay2 > ay1):
+            topx1 = ax2
+            topy1 = ay2
+            botx1 = ax1
+            boty1 = ay1
+
+        topx2 = cx1
+        topy2 = cy1
+        botx2 = cx2
+        boty2 = cy2
+        if (cy2 > cy1):
+            topx2 = cx2
+            topy2 = cy2
+            botx2 = cx1
+            boty2 = cy1
+        
+        bx1 = int((topx1+topx2)/2.0)
+        by1 = int((topy1+topy2)/2.0)
+        bx2 = int((botx1+botx2)/2.0)
+        by2 = int((boty1+boty2)/2.0)
         centralAxis = ((bx1, by1), (bx2, by2))
         centralAxisMidpoint = ((bx1+bx2)/2, (by1+by2)/2)
 

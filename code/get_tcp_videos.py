@@ -13,13 +13,13 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
 
     ### Set detection parameters ###
     # Canny Threshold
-    cannyThreshMin = 30
+    cannyThreshMin = 25
     cannyThreshMax = 100
     # Line Accumulator Matrix
     lineAccMin = 100
     lineAccMax = 300
     # Circle Accumulator Matrix
-    circleAccMin = 25
+    circleAccMin = 15
     circleAccMax = 300
     # Minimum circle radius
     minRadiusMin = 50
@@ -36,7 +36,7 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
     maxLineMin = 50
     maxLineMax = 250
     # Minimum distance between edges
-    minDistMin = 2
+    minDistMin = 20
     minDistMax = 100
     # Maximum distance between edges      
     maxDistMin = 2000
@@ -153,14 +153,14 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
                                 minLineLengthL, maxLineGapL, 
                                 minDistBtwnEdgesL, maxDistBtwnEdgesL, 
                                 minRadiusL, maxRadiusL, 
-                                dispToleranceL, 0.5)
+                                dispToleranceL, 0.85)
             
             (tcp_right, central_axis_pointr, color_image_right, right_edges) = detectTCP(image_right, cannyThresholdR,
                                 line_threshR, circ_threshR,
                                 minLineLengthR, maxLineGapR,
                                 minDistBtwnEdgesR, maxDistBtwnEdgesR,
                                 minRadiusR, maxRadiusR,
-                                dispToleranceR, 0.5)
+                                dispToleranceR, 0.85)
             image_left = color_image_left
             image_right = color_image_right
             

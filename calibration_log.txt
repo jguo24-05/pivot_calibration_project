@@ -16,4 +16,35 @@ Left Camera 2mm Tip
 Right Camera 2mm Tip
 --------------------
 294 frames detected out of 300
+--------------------./sam2_images/right_test_1/*.png
+--------------------
+1 frames detected out of 300
+--------------------
+./sam2_images/left_test_1/*.png
+--------------------
+471 frames detected out of 300
+--------------------
+./sam2_images/right_test_1/*.png
+--------------------
+524 frames detected out of 300
+--------------------
+./sam2_images/left_test_1/*.png
+--------------------
+471 frames detected out of 300
+--------------------
+./sam2_images/right_test_1/*.png
+--------------------
+524 frames detected out of 300
+--------------------
+./sam2_images/left_test_1/*.png
+--------------------
+471 frames detected out of 300
+--------------------
+./sam2_images/left_test_1/*.png
+--------------------
+322 frames detected out of 300
+--------------------
+./sam2_images/right_test_1/*.png
+--------------------
+321 frames detected out of 300
 --------------------

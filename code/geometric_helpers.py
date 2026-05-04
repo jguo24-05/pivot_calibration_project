@@ -15,16 +15,30 @@ def slopeRatio(line1, line2):
     slope2 = (v2 - v1) / (u2 - u1)
     return abs(slope1 / slope2)
     
+
+def cosTheta(line1, line2):
+    x1, y1, x2, y2 = line1[0]
+    u1, v1, u2, v2 = line2[0]
+
+    vec1 = (x1-x2, y1-y2)
+    vec2 = (u1-u2, v1-v2)
+
+    dotProduct = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+    mag1 = ((x1-x2)**2 + (y1-y2)**2)**0.5
+    mag2 = ((u1-u2)**2 + (v1-v2)**2)**0.5
+
+    return dotProduct / (mag1 * mag2)
+
    
 # Checks if point is on the line defined by (endpoint1, endpoint2) with the given tolerance
 def pointOnLine(point, endpoint1, endpoint2, tolerance):
     if ((endpoint2[0] - endpoint1[0]) == 0):    # vertical line
-        return point[0] == endpoint2[0]
+        return abs(point[0] - endpoint2[0]) < tolerance
     
     m = (endpoint2[1] - endpoint1[1]) / (endpoint2[0] - endpoint1[0])
-    c = endpoint1[1] - m * endpoint1[0]
-    expectedY = point[0] * m + c
-    return abs(expectedY - point[1]) < tolerance
+    b = endpoint1[1] - m * endpoint1[0]
+
+    return (abs(m*point[0] - point[1] + b) / (m**2 + 1)**0.5) < tolerance
 
 
 # Returns the euclidean distance between <m1, c1> and <m2, c2>
@@ -32,7 +46,7 @@ def distBetweenLines(line1, line2):
     if (are_lines_collinear(line1[0], line2[0], 15)):
         return 0
     else:
-        epsilon = 10^-9
+        epsilon = 10^-12
         ax1, ay1, ax2, ay2 = line1[0]
         bx1, by1, bx2, by2 = line2[0]
 
@@ -45,12 +59,8 @@ def distBetweenLines(line1, line2):
         elif (bx2-bx1 < epsilon):
             return 0
         else:
-            m1 = (ay2-ay1) / float((ax2-ax1))
-            m2 = (by2-by1) / float((bx2-bx1))
-            c1 = ay1 - m1*ax1
-            c2 = by1 - m2*bx1
-            return pow(pow((m1-m2), 2) + pow(c1-c2, 2), 0.5)
-    
+            return point_to_line_dist((ax1, ay1), (bx1, by1), (bx2, by2))
+        
 
 def point_to_line_dist(point, line_start, line_end):
     p = np.array(point)
@@ -84,8 +94,11 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
     lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=line_thresh, minLineLength=minLineLength, maxLineGap=maxLineGap) 
 
     if lines is not None:
+        lines = sorted(lines, key=lambda l: np.linalg.norm(l[0][:2] - l[0][2:]), reverse=True)
         if (len(lines) < 2):
             return None    # skip this frame if fewer than two lines were found 
+        
+        lines = lines[:10]  # only examine top 10 lines
     
         for i in range(len(lines)-1):  
             # Debugging 
@@ -95,15 +108,15 @@ def detectLines(edges, color_image, line_thresh, minLineLength, maxLineGap, minD
             for j in range(i, len(lines)):
                 # Debugging
                 # bx1, by1, bx2, by2 = lines[j][0]
-                # cv2.line(color_image, (bx1, by1), (bx2, by2), (255, 0, 0), 5)   
+                # cv2.line(color_image, (bx1, by1), (bx2, by2), (0, 255, 0), 5)   
 
                 line1 = lines[i]
                 line2 = lines[j]
-                
-                rSlope = slopeRatio(line1, line2)
+                  
                 distBtwnEdges = distBetweenLines(line1, line2)
+                cos = cosTheta(line1, line2)
                 
-                if ((rSlope < 1 + parallelTolerance) and (rSlope > 1 - parallelTolerance)):
+                if (abs(cos) > parallelTolerance):
                     if (distBtwnEdges > minDistBtwnEdges and distBtwnEdges < maxDistBtwnEdges): 
                         return (line1, line2)
                 #     else:

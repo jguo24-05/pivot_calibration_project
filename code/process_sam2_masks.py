@@ -13,7 +13,7 @@ def findTCPFromMask(filename, isTwoMMTip):
     # Minimum circle radius
     minRadius = 50   # Note: should be 30 for 2mm tip, 50 for 4mm tip
     if (isTwoMMTip):
-        minRadius = 30
+        minRadius = 20
     # Maximum circle radius
     maxRadius = 100
 
@@ -44,22 +44,44 @@ def findTCPFromMask(filename, isTwoMMTip):
         toolEdges = detectLines(grayContours, drawing, 
                                 line_thresh=50, 
                                 minLineLength=100, maxLineGap=10, 
-                                minDistBtwnEdges=2, maxDistBtwnEdges=2000,
-                                parallelTolerance=0.5)
+                                minDistBtwnEdges=20, maxDistBtwnEdges=2000,
+                                parallelTolerance=0.85)
         
         if (toolEdges is None):
-            cv2.putText(img, "The tool shaft was not detected this frame", (70, 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+            cv2.putText(drawing, "The tool shaft was not detected this frame", (70, 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+            print("Tool edges not detected")
+            print(f"File: {filename}")
     
         if (toolEdges is not None):
             line1 = toolEdges[0]
             line2 = toolEdges[1]
             ax1, ay1, ax2, ay2 = line1[0]
             cx1, cy1, cx2, cy2 = line2[0]
+
+            topx1 = ax1
+            topy1 = ay1
+            botx1 = ax2
+            boty1 = ay2
+            if (ay2 > ay1):
+                topx1 = ax2
+                topy1 = ay2
+                botx1 = ax1
+                boty1 = ay1
+
+            topx2 = cx1
+            topy2 = cy1
+            botx2 = cx2
+            boty2 = cy2
+            if (cy2 > cy1):
+                topx2 = cx2
+                topy2 = cy2
+                botx2 = cx1
+                boty2 = cy1
             
-            bx1 = int((ax1+cx1)/2.0)
-            by1 = int((ay1+cy1)/2.0)
-            bx2 = int((ax2+cx2)/2.0)
-            by2 = int((ay2+cy2)/2.0)
+            bx1 = int((topx1+topx2)/2.0)
+            by1 = int((topy1+topy2)/2.0)
+            bx2 = int((botx1+botx2)/2.0)
+            by2 = int((boty1+boty2)/2.0)
             centralAxis = ((bx1, by1), (bx2, by2))
 
             cv2.line(drawing, (ax1, ay1), (ax2, ay2), (255, 0, 0), 5)    
@@ -94,8 +116,8 @@ def findTCPFromMask(filename, isTwoMMTip):
                         cv2.circle(drawing, (center_x, center_y), 2, (255, 255, 0), 3)
                         # print(f"Radius: {radius}")
                         return (center, drawing, img)
-            else:
-                print("No circles :(")
+                    
+        cv2.putText(drawing, "The center point was not detected this frame", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
         return (None, drawing, img)
     return (None, color_image, color_image)
 
@@ -141,11 +163,11 @@ def findAndWriteTCPS(directory, jsonPath, showTCPs, isTwoMMTip):
             #     break
 
     # Calibration Log
-    # with open("./calibration_log.txt", "a") as f:
-    #     f.write(imgDirectory + "\n")
-    #     f.write("-" * 20 + "\n") 
-    #     f.write(f"{detectedFrames} frames detected out of 300\n")
-    #     f.write("-" * 20 + "\n") 
+    with open("./calibration_log.txt", "a") as f:
+        f.write(imgDirectory + "\n")
+        f.write("-" * 20 + "\n") 
+        f.write(f"{detectedFrames} frames detected out of 300\n")
+        f.write("-" * 20 + "\n") 
 
     # Write the detected points to a json file
     with open(jsonPath, 'w') as f:
