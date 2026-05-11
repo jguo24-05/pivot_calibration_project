@@ -7,19 +7,27 @@ import cv2
 # Calculate world coordinates based on projection matrices 
 # points must be formatted as np.array([[center_x], [center_y]], dtype=np.float32)
 def calculateWorldPoint(json_path, projPoints1, projPoints2):
-     projPoints1 = np.array(projPoints1, dtype=np.float32).reshape(2, -1)
-     projPoints2 = np.array(projPoints2, dtype=np.float32).reshape(2, -1)
+    with open(json_path, 'r') as file:
+        data = json.load(file)
+        R = np.array(data["R"])
+        T = np.array(data["T"])
+        newcam_mtx745 = np.array(data["745_intrinsic_new"])
+        newcam_mtx746 = np.array(data["746_intrinsic_new"])
 
-     with open(json_path, 'r') as file:
-        json_data = json.load(file)
-        projMatr1 = np.array(json_data["745_projection_mtx"])
-        projMatr2 = np.array(json_data["746_projection_mtx"])
-        homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
+    P1 = newcam_mtx745 @ np.array([[1, 0, 0, 0], 
+                                   [0, 1, 0, 0], 
+                                   [0, 0, 1, 0]])
 
-        print(homogeneous[3])
+    extrinsic2 = np.hstack((R, T.reshape(3, 1)))
+    P2 = newcam_mtx746 @ extrinsic2
 
-        points_3d = homogeneous[:3] / homogeneous[3]
-        return points_3d.flatten()                      ## TODO: is this correct?
+    pts1 = np.array(projPoints1, dtype=np.float32).reshape(2, 1)
+    pts2 = np.array(projPoints2, dtype=np.float32).reshape(2, 1)
+
+    homogeneous = cv2.triangulatePoints(P1, P2, pts1, pts2)
+    points_3d = homogeneous[:3] / homogeneous[3]
+    
+    return points_3d.flatten()
 
 
 ################# Attempts to find the TCP in the given image #################

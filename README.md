@@ -25,3 +25,4 @@ Issues and Next Steps:
 
 - The current code only triangulates the tool center point. It can be modified to return the central axis as well, which can be triangulated to find the orientation of the tool shaft.
 - Using the detected tool center points, formulate a least-squares equation to find the transform from the end-effector to the tool center point.
+- Cross-check the accuracy of the 3D triangulation with some known world points.

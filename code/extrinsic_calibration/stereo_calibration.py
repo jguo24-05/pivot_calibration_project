@@ -84,6 +84,7 @@ def stereo_calibrate(mtx1, dist1, newmtx1, mtx2, dist2, newmtx2, filepath1, file
             imgpoints_right.append(corners2)
  
     stereocalibration_flags = 0
+    
     ret, _, _, _, _, R, T, E, F = cv2.stereoCalibrate(objpoints, 
                                                       imgpoints_left, imgpoints_right, 
                                                       mtx1, dist1,
@@ -95,15 +96,15 @@ def stereo_calibrate(mtx1, dist1, newmtx1, mtx2, dist2, newmtx2, filepath1, file
     rectL, rectR, projMtxL, projMtxR, Q, roiL, roiR = cv2.stereoRectify(mtx1, dist1,
                                                                         mtx2, dist2,
                                                                         (width, height),
-                                                                        R, T)
+                                                                        R, T, alpha=0)
     
     data = {"R":R.tolist(),
             "T":T.tolist(),
             "F":F.tolist(),
             "E":E.tolist(),
             "Q":Q.tolist(),
-            "745_projection_mtx":projMtxL.tolist(),
-            "746_projection_mtx":projMtxR.tolist()}
+            "745_intrinsic_new":newmtx1.tolist(),
+            "746_intrinsic_new":newmtx2.tolist()}
 
     with open(OUTPUT_JSON, 'w') as json_file:
         json.dump(data, json_file, indent=4)
