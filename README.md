@@ -20,5 +20,8 @@ Important Notes:
 - When collecting raw TCP images, try to minimize motion blur, as the masks are difficult to process on blurred images.
 
 
-Next Steps:
-Using the detected tool center points, formulate a least-squares equation to find the transform from the end-effector to the tool center point.
+Issues and Next Steps:
+- Currently, the code that initially detects the tool center point has a low detection rate when the ball is not in the center of both camera frames, and it is most robust when the tool is equidistant from both cameras.
+
+- The current code only triangulates the tool center point. It can be modified to return the central axis as well, which can be triangulated to find the orientation of the tool shaft.
+- Using the detected tool center points, formulate a least-squares equation to find the transform from the end-effector to the tool center point.
