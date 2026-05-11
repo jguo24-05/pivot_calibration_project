@@ -27,6 +27,7 @@ def triangulateTCPs(left_json_path, right_json_path, numFrames):
 
     return world_points
 
+
 ### Plotting the computed TCPs ###
 def plotTCPs(world_points):
     ### Plotting the 3D points with Matplotlib ###

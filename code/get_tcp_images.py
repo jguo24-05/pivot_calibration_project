@@ -97,9 +97,6 @@ def undistort_image(img, mtx, dst):
     newcam_mtx, roi=cv2.getOptimalNewCameraMatrix(mtx, dst, (w,h), 1, (w,h))
     undist = cv2.undistort(img, mtx, dst, None, newcam_mtx)
 
-    # crop the image
-    x, y, w, h = roi
-    undist = undist[y:y+h, x:x+w]
     return newcam_mtx, undist
 
     

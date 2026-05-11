@@ -6,46 +6,20 @@ import cv2
 ######################### DETECTION LOGIC #########################
 # Calculate world coordinates based on projection matrices 
 # points must be formatted as np.array([[center_x], [center_y]], dtype=np.float32)
-# def calculateWorldPoint(json_path, projPoints1, projPoints2):
-#      with open(json_path, 'r') as file:
-#         json_data = json.load(file)
-#         projMatr1 = np.array(json_data["745_projection_mtx"])
-#         projMatr2 = np.array(json_data["746_projection_mtx"])
-#         homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
-
-#         print(homogeneous[3])
-
-#         points_3d = homogeneous[:3] / homogeneous[3]
-#         return points_3d.flatten()                      ## TODO: is this correct?
-     
 def calculateWorldPoint(json_path, projPoints1, projPoints2):
-    with open(json_path, 'r') as file:
-        data = json.load(file)
-        
-        # Load Rectified Projection Matrices (from your JSON)
-        P1 = np.array(data["745_projection_mtx"])
-        P2 = np.array(data["746_projection_mtx"])
-        
-        # You need these from your calibration to "clean" the points
-        K1 = np.array(data["745_intrinsic_mtx"]) # Ensure these exist in JSON
-        D1 = np.array(data["745_dist_coeffs"])
-        R1 = np.array(data["745_rect_transform"]) # From stereoRectify
-        
-        K2 = np.array(data["746_intrinsic_mtx"])
-        D2 = np.array(data["746_dist_coeffs"])
-        R2 = np.array(data["746_rect_transform"])
+     projPoints1 = np.array(projPoints1, dtype=np.float32).reshape(2, -1)
+     projPoints2 = np.array(projPoints2, dtype=np.float32).reshape(2, -1)
 
-        # Step 1: Map raw pixels to Rectified Plane
-        # Use P1 and P2 here so the points end up in the coordinate system the P matrices expect
-        points1_rect = cv2.undistortPoints(projPoints1, K1, D1, R=R1, P=P1)
-        points2_rect = cv2.undistortPoints(projPoints2, K2, D2, R=R2, P=P2)
+     with open(json_path, 'r') as file:
+        json_data = json.load(file)
+        projMatr1 = np.array(json_data["745_projection_mtx"])
+        projMatr2 = np.array(json_data["746_projection_mtx"])
+        homogeneous = cv2.triangulatePoints(projMatr1, projMatr2, projPoints1, projPoints2)
 
-        # Step 2: Triangulate the "clean" points
-        homogeneous = cv2.triangulatePoints(P1, P2, points1_rect, points2_rect)
-        
-        # Step 3: Normalize
-        world_coords = homogeneous[:3] / homogeneous[3]
-        return world_coords.flatten()
+        print(homogeneous[3])
+
+        points_3d = homogeneous[:3] / homogeneous[3]
+        return points_3d.flatten()                      ## TODO: is this correct?
 
 
 ################# Attempts to find the TCP in the given image #################
