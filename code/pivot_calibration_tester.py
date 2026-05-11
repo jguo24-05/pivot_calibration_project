@@ -34,7 +34,7 @@ def pivotCalibrationTester():
     minDistMin = 20
     minDistMax = 400
     # Maximum distance between edges      
-    maxDistMin = 10000
+    maxDistMin = 100
     maxDistMax = 20000
     # Error for tip and axis alignment
     errorMin = 20

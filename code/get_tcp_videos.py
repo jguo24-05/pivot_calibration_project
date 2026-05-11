@@ -39,7 +39,7 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
     minDistMin = 20
     minDistMax = 100
     # Maximum distance between edges      
-    maxDistMin = 2000
+    maxDistMin = 500
     maxDistMax = 2500
     # Error for tip and axis alignment
     errorMin = 20
