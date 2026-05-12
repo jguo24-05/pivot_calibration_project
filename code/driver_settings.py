@@ -6,9 +6,9 @@ def init():
     global rightRawDirectory
     global pointsDirectory
 
-    leftRawDirectory = "./initial_images/left_test_1"
-    rightRawDirectory = "./initial_images/right_test_1"
-    pointsDirectory = "./detected_points/initial_points_test_1.json"
+    leftRawDirectory = "./initial_images/left_test_0"
+    rightRawDirectory = "./initial_images/right_test_0"
+    pointsDirectory = "./detected_points/initial_points_test_0.json"
     
 
     # settings for detecting the tool center point
@@ -18,7 +18,7 @@ def init():
     global left_initial_pts 
     global right_initial_pts 
 
-    isTwoMMTip = False
+    isTwoMMTip = True
     showDetectedTCPs = True
     targetFrames = 300
     left_initial_pts = []
@@ -29,16 +29,16 @@ def init():
     global leftMaskedDirectory 
     global rightMaskedDirectory 
 
-    leftMaskedDirectory = "./sam2_images/left_test_1"
-    rightMaskedDirectory = "./sam2_images/right_test_1"
+    leftMaskedDirectory = "./sam2_images/left_test_0"
+    rightMaskedDirectory = "./sam2_images/right_test_0"
 
 
     # json paths: the json files that hold the lists of detected TCPs
     global leftTCPJSONPath
     global rightTCPJSONPath 
 
-    leftTCPJSONPath = "./detected_points/tcp_left_test_1.json"
-    rightTCPJSONPath = "./detected_points/tcp_right_test_1.json"
+    leftTCPJSONPath = "./detected_points/tcp_left_test_0.json"
+    rightTCPJSONPath = "./detected_points/tcp_right_test_0.json"
 
 
 init()
