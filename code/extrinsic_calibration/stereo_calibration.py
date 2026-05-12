@@ -5,6 +5,7 @@ import json
 
 '''
 Calibration Call:
+
 with open(f"./calibration_data/cam745_calibration.json", 'r') as file:
     json_data = json.load(file)
 
@@ -19,8 +20,8 @@ cameraMatrix746 = np.array(json_data['mtx'])
 distCoeffs746 = np.array(json_data['dist'])
 newmtx746 = np.array(json_data['newcam_mtx'])
 
-stereo_calibrate(cameraMatrix746, distCoeffs746, newmtx746, cameraMatrix745, distCoeffs745, newmtx745,
-                 "./charuco_images/external_746/charuco*.png", "./charuco_images/external_745/charuco*.png",
+stereo_calibrate(cameraMatrix745, distCoeffs745, newmtx745, cameraMatrix746, distCoeffs746, newmtx746,
+                 "./charuco_images/745/charuco*.png", "./charuco_images/746/charuco*.png",
                  "./calibration_data/external_parameters.json")
     
 '''
@@ -93,6 +94,25 @@ def stereo_calibrate(mtx1, dist1, newmtx1, mtx2, dist2, newmtx2, filepath1, file
                                                       criteria = criteria,
                                                       flags = stereocalibration_flags)
     
+    # Calculate total error for each pair
+    per_view_errors = []
+
+    for i in range(len(objpoints)):
+        # Project the 3D checkerboard points into 2D using the calculated R and T
+        # We do this for the left and right images
+        
+        # Left Camera (at origin)
+        imgpoints_left_projected, _ = cv2.projectPoints(objpoints[i], np.zeros(3), np.zeros(3), mtx1, dist1)
+        error_left = cv2.norm(imgpoints_left[i], imgpoints_left_projected, cv2.NORM_L2) / len(imgpoints_left_projected)
+        
+        # Right Camera (relative to left)
+        imgpoints_right_projected, _ = cv2.projectPoints(objpoints[i], R, T, mtx2, dist2)
+        error_right = cv2.norm(imgpoints_right[i], imgpoints_right_projected, cv2.NORM_L2) / len(imgpoints_right_projected)
+        
+        total_error = (error_left + error_right) / 2
+        per_view_errors.append(total_error)
+        print(f"Image Pair {i}: Error = {total_error:.4f} (Left: {c1_images_names[i]})")
+
     rectL, rectR, projMtxL, projMtxR, Q, roiL, roiR = cv2.stereoRectify(mtx1, dist1,
                                                                         mtx2, dist2,
                                                                         (width, height),
