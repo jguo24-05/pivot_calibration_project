@@ -6,9 +6,9 @@ def init():
     global rightRawDirectory
     global pointsDirectory
 
-    leftRawDirectory = "./code/left_test_1"
-    rightRawDirectory = "./code/right_test_1"
-    pointsDirectory = "./detected_points_test1.json"
+    leftRawDirectory = "./tcp_images/left_test"
+    rightRawDirectory = "./tcp_images/right_test"
+    pointsDirectory = "./detected_points_test.json"
     
 
     # settings for detecting the tool center point
@@ -29,16 +29,16 @@ def init():
     global leftMaskedDirectory 
     global rightMaskedDirectory 
 
-    leftMaskedDirectory = "./sam2_images/left_test_1"
-    rightMaskedDirectory = "./sam2_images/right_test_1"
+    leftMaskedDirectory = "./sam2_images/left_test"
+    rightMaskedDirectory = "./sam2_images/right_test"
 
 
     # json paths: the json files that hold the lists of detected TCPs
     global leftTCPJSONPath
     global rightTCPJSONPath 
 
-    leftTCPJSONPath = "./tcp_left_test1.json"
-    rightTCPJSONPath = "./tcp_right_test1.json"
+    leftTCPJSONPath = "./tcp_left_test.json"
+    rightTCPJSONPath = "./tcp_right_test.json"
 
 
 init()

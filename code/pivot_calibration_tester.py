@@ -1,4 +1,5 @@
 from geometric_helpers import *
+from draw_epipolar_lines import *
 from find_tcp import *
 import cv2
 
@@ -7,6 +8,10 @@ def pivotCalibrationTester():
     (cam_array, frame_counts, converter,
      cameraMatrix746, distCoeffs746, 
      cameraMatrix745, distCoeffs745) = openCamerasAndCalibrationFiles(200000, 200000)
+    
+    with open('./calibration_data/external_parameters.json', 'r') as file:
+        data = json.load(file)
+        F = np.array(data["F"])
     
     ### Detection Parameters ###
     # Canny Threshold
@@ -153,6 +158,10 @@ def pivotCalibrationTester():
             z = worldCoordinate[2]
             cv2.putText(image_left, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
             cv2.putText(image_right, f"Position: {x:.2f}, {y:.2f}, {z:.2f}", (70, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)
+
+
+            drawEpipolarLines(F, color_imageL, color_imageR, tcp_left, tcp_right, successful_detections)
+
             # poses.append(worldCoordinate)
             # with open("./calibration_log.txt", "a") as f:
             #     f.write(f"{worldCoordinate}\n")

@@ -16,7 +16,7 @@ To detect the tool center point:
 
 
 Important Notes: 
-- Make sure the 745 camera is plugged into the first USB slot, and 746 the second. The 746 camera is calibrated as the left camera, and the 745 camera the right.
+- Make sure the 745 camera is plugged into the first USB slot, and 746 the second. The 745 camera is calibrated as the left camera, and the 746 camera the right.
 - When collecting raw TCP images, try to minimize motion blur, as the masks are difficult to process on blurred images.
 
 

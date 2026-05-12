@@ -161,8 +161,10 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
                                 minDistBtwnEdgesR, maxDistBtwnEdgesR,
                                 minRadiusR, maxRadiusR,
                                 dispToleranceR, 0.85)
-            image_left = color_image_left
-            image_right = color_image_right
+            
+            # Debugging
+            # image_left = color_image_left
+            # image_right = color_image_right
             
             if (tcp_left is not None and tcp_right is not None and
                 central_axis_pointl is not None and central_axis_pointr is not None):

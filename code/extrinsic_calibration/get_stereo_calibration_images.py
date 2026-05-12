@@ -1,7 +1,5 @@
 import pypylon.pylon as py
-import numpy as np
 import cv2
-import json
 
 #criteria used by checkerboard pattern detector.
 #Change this if the code can't find the checkerboard
@@ -73,10 +71,10 @@ def getCalibrationImages(filepath1, filepath2):
                     key = cv2.waitKey(1) & 0xFF
                     if (currentCam_id == cam_id and key == ord('s')):
                         if (currentCam_id == 0):
-                            cv2.imwrite(f'{filepath1}/charuco{97+imageCounter//2}.png', img_copy)
+                            cv2.imwrite(f'{filepath1}/charuco{imageCounter//2}.png', img_copy)
                             currentCam_id = 1
                         else:
-                            cv2.imwrite(f'{filepath2}/charuco{97+imageCounter//2}.png', img_copy)
+                            cv2.imwrite(f'{filepath2}/charuco{imageCounter//2}.png', img_copy)
                             currentCam_id = 0
                         imageCounter += 1
 
