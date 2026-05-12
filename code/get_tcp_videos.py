@@ -211,8 +211,8 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
     cam_array.StopGrabbing()
     cam_array.Close()
 
-    clean_left = [[int(f), int(x), int(y)] for f, x, y in lcam_points]
-    clean_right = [[int(f), int(x), int(y)] for f, x, y in rcam_points]
+    clean_left = [[int(x), int(y)] for x, y in lcam_points]
+    clean_right = [[int(x), int(y)] for x, y in rcam_points]
     
     points_dict = {
         "left_points": clean_left,
