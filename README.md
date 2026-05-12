@@ -2,6 +2,8 @@
 
 Contact: jguo96@jh.edu
 
+Task: Automate the pivot calibration process by using a stereo vision system to track the position of a drill tip.
+
 ## Using the repo:
 
 To calibrate the Basler cameras (they are calibrated already):
