@@ -33,7 +33,7 @@ def plotTCPs(world_points):
     ### Plotting the 3D points with Matplotlib ###
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    cmap = mpl.colormaps['viridis']
+    cmap = mpl.colormaps['rainbow']
 
     for i in range(len(world_points)):
         color = cmap(i / len(world_points))

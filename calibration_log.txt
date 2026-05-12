@@ -64,3 +64,19 @@ Right Camera 2mm Tip
 --------------------
 561 frames detected out of 300
 --------------------
+./sam2_images/left_test_0/*.png
+--------------------
+282 frames detected out of 300
+--------------------
+./sam2_images/right_test_0/*.png
+--------------------
+269 frames detected out of 300
+--------------------
+./sam2_images/left_test_0/*.png
+--------------------
+240 frames detected out of 300
+--------------------
+./sam2_images/right_test_0/*.png
+--------------------
+1 frames detected out of 300
+--------------------
