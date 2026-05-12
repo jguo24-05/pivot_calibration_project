@@ -14,4 +14,4 @@ segment_images(video_dir = driver_settings.leftRawDirectory,
 
 segment_images(video_dir = driver_settings.rightRawDirectory,
                output_dir = driver_settings.rightMaskedDirectory,
-               firstPoints = left_initial_pts)
+               firstPoints = right_initial_pts)

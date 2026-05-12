@@ -174,10 +174,10 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
                 cv2.imwrite(f"{rightDirectory}/{frames:05d}.jpg", image_right)
                 frames += 1
 
-                lcam_points.append([0, tcp_left[0][0], tcp_left[1][0]])
-                lcam_points.append([0, central_axis_pointl[0], central_axis_pointl[1]])
-                rcam_points.append([0, tcp_right[0][0], tcp_right[1][0]])
-                rcam_points.append([0, central_axis_pointr[0], central_axis_pointr[1]])
+                lcam_points.append([tcp_left[0][0], tcp_left[1][0]])
+                lcam_points.append([central_axis_pointl[0], central_axis_pointl[1]])
+                rcam_points.append([tcp_right[0][0], tcp_right[1][0]])
+                rcam_points.append([central_axis_pointr[0], central_axis_pointr[1]])
 
                 cv2.circle(color_image_left, (int(tcp_left[0][0]), int(tcp_left[1][0])), 5, (0, 255, 0), 4)   # center
                 cv2.circle(color_image_left, (int(central_axis_pointl[0]), int(central_axis_pointl[1])),    # shaft
