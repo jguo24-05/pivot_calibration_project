@@ -1,4 +1,4 @@
-## Calibrating the position of tool center point with respect to a robot base using a stereo vision system ##
+#### Pivot Calibration with a Stereo Vision Setup ####
 
 Contact: jguo96@jh.edu
 
