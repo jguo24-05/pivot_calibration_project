@@ -1,4 +1,4 @@
-#### Pivot Calibration with a Stereo Vision Setup ####
+# Pivot Calibration with a Stereo Vision Setup
 
 Contact: jguo96@jh.edu
 
