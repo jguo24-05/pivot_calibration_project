@@ -18,7 +18,7 @@ def init():
     global left_initial_pts 
     global right_initial_pts 
 
-    isTwoMMTip = True
+    isTwoMMTip = False
     showDetectedTCPs = True
     targetFrames = 300
     left_initial_pts = []
