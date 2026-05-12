@@ -1,5 +1,5 @@
 Calibrating the position of tool center point with respect to a robot base using a stereo vision system
-
+Contact: jguo96@jh.edu
 Using the repo:
 
 To calibrate the Basler cameras (they are calibrated already):
