@@ -22,7 +22,7 @@ def getRawTCPImages(leftDirectory, rightDirectory, jsonDirectory, targetFrames, 
     circleAccMin = 15
     circleAccMax = 300
     # Minimum circle radius
-    minRadiusMin = 50
+    minRadiusMin = 40
     if (is2MMTip):
         minRadiusMin = 30
     minRadiusMax = 80

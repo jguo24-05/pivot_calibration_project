@@ -11,7 +11,7 @@ def findTCPFromMask(filename, isTwoMMTip):
     # Circle Accumulator Matrix
     circleAcc = 15 
     # Minimum circle radius
-    minRadius = 50   # Note: should be 30 for 2mm tip, 50 for 4mm tip
+    minRadius = 40   # Note: should be 30 for 2mm tip, 30-40 for 4mm tip
     if (isTwoMMTip):
         minRadius = 20
     # Maximum circle radius
@@ -157,10 +157,10 @@ def findAndWriteTCPS(directory, jsonPath, showTCPs, isTwoMMTip):
             cv2.waitKey(1)
 
             # For clicking through the images one by one
-            key = cv2.waitKey(0)
-            if key == ord('q') or key == 27:
-                cv2.destroyAllWindows()
-                break
+            # key = cv2.waitKey(0)
+            # if key == ord('q') or key == 27:
+            #     cv2.destroyAllWindows()
+            #     break
 
     # Calibration Log
     with open("./calibration_log.txt", "a") as f:
