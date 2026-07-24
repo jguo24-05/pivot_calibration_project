@@ -6,10 +6,10 @@ Task: Automate the pivot calibration process by using a stereo vision system to 
 
 ## Using the repo:
 
-To calibrate the Basler cameras (they are calibrated already):
+To calibrate the Basler cameras:
 1. Run intrinsic_calibration/charuco_calibration.py to find each camera's internal parameters. At the top, input the settings for the charuco board. A charuco board can also be generated with intrinsic_calibration/charuco_generation.py.
 
-2. Run extrinsic_calibration/stereo_calibration.py to find the external parameters of the 2 camera system. This will require a checkerboard of known dimensions. While calibrating, press 's' to snap images. Both cameras should have an image of the current checkerboard before moving on. To keep things consistent, also make sure that the number of images taken for both cameras is equal before moving the checkerboard to the next configuration.
+2. Run extrinsic_calibration/stereo_calibration.py to find the external parameters of the 2 camera system. This will require a checkerboard of known dimensions. While calibrating, press 's' to snap images. Both cameras should have an image of the current checkerboard before moving on. To keep things consistent, it helps to make sure that the number of images taken for both cameras is equal before moving the checkerboard to the next configuration.
 
 
 ## To detect the tool center point:
